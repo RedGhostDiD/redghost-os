@@ -1,0 +1,166 @@
+[
+  {
+    "slug": "mk47",
+    "id": "RG//RB-047",
+    "name": "MK47",
+    "type": "ROBOTICS",
+    "status": "WIP",
+    "category": "COMBAT",
+    "systems": ["MECHANICAL", "ELECTRONICS", "SOFTWARE"],
+    "specs": [
+      ["MCU", "ESP32-S3"],
+      ["DRIVE", "DUAL DC 12V"],
+      ["CHASSIS", "6061 ALUMINUM"],
+      ["WEIGHT", "1.4KG"]
+    ],
+    "summary": "Robot de combate en desarrollo. Chasis, control y firmware propios.",
+    "description": [
+      "Ficha placeholder — reemplaza este texto con la bitácora real del proyecto.",
+      "Incluye aquí decisiones de diseño, problemas encontrados y estado actual del chasis, la electrónica y el software de control."
+    ],
+    "revision": "04",
+    "build": 17,
+    "tests": 23,
+    "failures": 7,
+    "lastModified": "2026-09-09T16:38:00",
+    "pipeline": "build",
+    "git": { "repo": "github.com/RedGhost-DiD/mk47", "commits": 62, "branch": "main", "latest": "fix: gripper servo timing" }
+  },
+  {
+    "slug": "robot-soccer",
+    "id": "RG//RB-014",
+    "name": "SOCCER ROBOT",
+    "type": "ROBOTICS",
+    "status": "TESTING",
+    "category": "SOCCER",
+    "systems": ["MECHANICAL", "CONTROL", "AI"],
+    "specs": [
+      ["MCU", "ESP32-S3"],
+      ["VISION", "OV3660"],
+      ["SENSORS", "TCS34725 ×4"],
+      ["MOTOR", "L298N ×2"]
+    ],
+    "summary": "Robot autónomo para fútbol de robots: visión, estrategia y control de movimiento.",
+    "description": [
+      "Ficha placeholder — describe aquí la arquitectura de control, el stack de visión y la estrategia de juego."
+    ],
+    "revision": "03",
+    "build": 29,
+    "tests": 41,
+    "failures": 3,
+    "lastModified": "2026-09-08T11:05:00",
+    "pipeline": "test",
+    "git": { "repo": "github.com/RedGhost-DiD/robot-soccer", "commits": 118, "branch": "main", "latest": "tune: vision threshold under low light" }
+  },
+  {
+    "slug": "redghost-os",
+    "id": "RG//SW-008",
+    "name": "REDGHOST.OS",
+    "type": "SOFTWARE",
+    "status": "ACTIVE",
+    "stack": ["TYPESCRIPT", "NEXT.JS", "TAILWIND"],
+    "specs": [
+      ["FRAMEWORK", "NEXT.JS 16"],
+      ["RUNTIME", "NODE 22 / EDGE"],
+      ["STYLING", "TAILWIND V4"],
+      ["LANG", "TYPESCRIPT"]
+    ],
+    "summary": "El sistema que estás viendo ahora mismo.",
+    "description": [
+      "Interfaz personal en forma de sistema operativo: boot sequence, dashboard modular y base de datos de proyectos."
+    ],
+    "revision": "12",
+    "build": 84,
+    "tests": 6,
+    "failures": 0,
+    "lastModified": "2026-09-09T21:10:00",
+    "pipeline": "iterate",
+    "git": { "repo": "github.com/RedGhost-DiD/redghost-os", "commits": 231, "branch": "main", "latest": "feat: breach protocol minigame" }
+  },
+  {
+    "slug": "sensor-node",
+    "id": "RG//HW-021",
+    "name": "SENSOR NODE",
+    "type": "HARDWARE",
+    "status": "PROTOTYPE",
+    "systems": ["ESP32", "SENSORS", "PCB"],
+    "specs": [
+      ["MCU", "ESP32-WROOM-32"],
+      ["SENSOR", "BME280"],
+      ["RADIO", "LORA SX1276"],
+      ["POWER", "18650 LI-ION"]
+    ],
+    "summary": "Nodo de sensores inalámbrico basado en ESP32.",
+    "description": [
+      "Ficha placeholder — documenta aquí el esquemático, el PCB y el firmware del nodo."
+    ],
+    "revision": "02",
+    "build": 9,
+    "tests": 11,
+    "failures": 2,
+    "lastModified": "2026-09-07T09:20:00",
+    "pipeline": "build",
+    "git": { "repo": "github.com/RedGhost-DiD/sensor-node", "commits": 34, "branch": "main", "latest": "fix: thermal shutdown threshold" },
+    "postmortem": {
+      "problem": "El primer prototipo se sobrecalentaba en corridas largas.",
+      "cause": "Mala gestión térmica en el módulo ESP32.",
+      "fix": "Se añadió disipador y se cambió la posición de montaje.",
+      "result": "Temperatura ↓ 18°C."
+    }
+  },
+  {
+    "slug": "glitch-ui-kit",
+    "id": "RG//DS-005",
+    "name": "GLITCH UI KIT",
+    "type": "DESIGN",
+    "status": "EXPERIMENTAL",
+    "stack": ["FIGMA", "SVG"],
+    "specs": [
+      ["TOOL", "FIGMA"],
+      ["EXPORT", "SVG / REACT"],
+      ["TOKENS", "42"],
+      ["COMPONENTS", "18"]
+    ],
+    "summary": "Kit de componentes de interfaz con estética glitch/cyberpunk.",
+    "description": [
+      "Ficha placeholder — enlaza aquí los recursos de diseño y los SVG exportados."
+    ],
+    "revision": "01",
+    "build": 4,
+    "tests": 0,
+    "failures": 0,
+    "lastModified": "2026-09-06T18:00:00",
+    "pipeline": "think"
+  },
+  {
+    "slug": "exp-009",
+    "id": "RG//EXP-009",
+    "name": "EXP-009",
+    "type": "ROBOTICS",
+    "status": "FAILED",
+    "category": "EXPERIMENTAL",
+    "systems": ["MECHANICAL"],
+    "specs": [
+      ["MCU", "STM32F103"],
+      ["ACTUATORS", "3× MG996R"],
+      ["LINKS", "3-DOF"],
+      ["RESULT", "RETIRED"]
+    ],
+    "summary": "Brazo articulado de bajo costo — retirado tras fallos mecánicos repetidos.",
+    "description": [
+      "Ficha placeholder — documenta aquí qué se intentó y por qué se abandonó."
+    ],
+    "revision": "01",
+    "build": 3,
+    "tests": 5,
+    "failures": 5,
+    "lastModified": "2026-09-05T13:00:00",
+    "pipeline": "test",
+    "postmortem": {
+      "problem": "Interferencia mecánica entre el segundo y tercer eslabón.",
+      "cause": "Geometría del eslabón mal calculada en la primera revisión.",
+      "fix": "—",
+      "result": "Retirado. La geometría importa."
+    }
+  }
+]
