@@ -1,45 +1,60 @@
-import Panel from "@/components/Panel";
-import { STORE_ITEMS } from "@/lib/store";
+import BlackMarketButton from "@/components/BlackMarketButton";
 
-export const metadata = { title: "STORE // REDGHOST_OS" };
+export const metadata = { title: "BLACK MARKET // REDGHOST_OS" };
+
+const CATEGORIES = [
+  "SUDADERAS",
+  "DROPS",
+  "COLABS",
+  "MERCH D.I.D",
+  "PLANOS",
+  "CIRCUITOS",
+  "PIEZAS",
+];
 
 export default function StorePage() {
   return (
-    <div className="flex flex-col gap-5">
-      <Panel id="MOD_070" title="RedGhost Store" status={{ label: "AVAILABLE" }}>
-        <h2 className="text-sm tracking-[0.2em] text-[var(--rg-red)] rg-glow-red mb-2">
-          DIGITAL ASSETS
-        </h2>
-        <p className="text-xs text-[var(--rg-text-dim)] leading-relaxed">
-          SVG, PCB, archivos KiCad, modelos y diseños de robots. Catálogo
-          visual — el checkout se activa en una siguiente fase.
-        </p>
-      </Panel>
+    <div className="min-h-[65vh] flex flex-col items-center justify-center text-center gap-2 px-4">
+      <p
+        className="text-[9px] tracking-[0.15em] mb-4"
+        style={{ color: "var(--rg-danger)" }}
+      >
+        {"> ENCRYPTED ZONE // AUTHORIZED PERSONNEL ONLY"}
+      </p>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {STORE_ITEMS.map((item, i) => (
-          <Panel
-            key={item.code}
-            id={item.code}
-            title={item.type}
-            status={{ label: "SOON", tone: "orange" }}
-            delayMs={220 + i * 130}
-          >
-            <h3 className="text-sm tracking-[0.15em] text-[var(--rg-text)] mb-3">
-              {item.name}
-            </h3>
-            <span
-              className="inline-block text-[10px] tracking-[0.15em] border px-3 py-1.5"
-              style={{
-                borderColor: "var(--rg-red-line)",
-                color: "var(--rg-text-faint)",
-              }}
-            >
-              [ COMING SOON ]
-            </span>
-          </Panel>
-        ))}
+      <h1
+        className="rg-market-title text-3xl sm:text-5xl font-semibold tracking-[0.15em] sm:tracking-[0.2em]"
+      >
+        BLACK MARKET
+      </h1>
+      <p
+        className="text-[10px] sm:text-xs tracking-[0.35em] rg-glow-purple"
+        style={{ color: "var(--rg-purple)" }}
+      >
+        D.I.D COMMERCE NODE
+      </p>
+
+      <p className="rg-market-warning mt-6">
+        <span className="rg-blink">⚠</span>&nbsp; ACCESO RESTRINGIDO — ZONA COMERCIAL &nbsp;<span className="rg-blink">⚠</span>
+      </p>
+
+      <div className="mt-6">
+        <BlackMarketButton />
       </div>
+
+      <p
+        className="mt-8 text-[9px] sm:text-[10px] tracking-[0.25em] max-w-md"
+        style={{ color: "var(--rg-purple)" }}
+      >
+        {CATEGORIES.join(" · ")}
+      </p>
+
+      <p
+        className="mt-10 text-[8px] tracking-[0.2em]"
+        style={{ color: "var(--rg-text-faint)" }}
+      >
+        ALL ITEMS // DESIGNED / BUILT / DISTRIBUTED BY REDGHOST
+      </p>
     </div>
   );
 }

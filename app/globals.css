@@ -21,6 +21,17 @@
   --rg-orange: #ffb000;
   --rg-orange-dim: #7a5200;
 
+  /* purple — reserved for rare identity accents (e.g. the Store / Black
+     Market node), never mixed into the main red/orange/green system. */
+  --rg-purple: #b026ff;
+  --rg-purple-dim: #5c1490;
+  --rg-purple-line: rgba(176, 38, 255, 0.22);
+
+  /* stable danger red — always red, even inside a scope that remaps
+     --rg-red (e.g. .rg-store-theme). Use for warnings that must stay red
+     regardless of the ambient section palette. */
+  --rg-danger: #ff163d;
+
   --rg-text: #d8d8df;
   --rg-text-dim: #9a98a8;
   --rg-text-faint: #666675;
@@ -35,6 +46,104 @@
   --color-orange: var(--rg-orange);
   --color-green: var(--rg-green);
   --font-mono: var(--font-mono);
+}
+
+/* Store section theme — swaps the site's "identity" color (normally red:
+   borders, nav, headers, glow, void background) for a true, saturated
+   orange while inside /store, so the whole interface reads as a distinct
+   orange/red/green/purple "Black Market" zone. Applied to <body> by
+   <StoreThemeEffect> only when the current route is /store — set on body
+   (not a wrapping div) so it also reaches decor layers rendered outside
+   the (system) layout tree (BinaryRain, the atmosphere glow, the grid).
+   Semantic red (warnings, --rg-danger) is untouched on purpose. Note:
+   this is deliberately NOT var(--rg-orange) — that token is the site's
+   amber/yellow accent; the Black Market needs a redder, more saturated
+   orange, defined here on its own. */
+.rg-store-theme {
+  --rg-red: #ff6a00;
+  --rg-red-dim: #7a3300;
+  --rg-red-soft: #ff9a42;
+  --rg-red-line: rgba(255, 106, 0, 0.4);
+  --rg-red-line-soft: rgba(255, 106, 0, 0.18);
+
+  --rg-void: #140700;
+  --rg-void-2: #1d0a00;
+  --rg-panel: #170800;
+  --rg-panel-2: #210d00;
+}
+
+.rg-store-theme .rg-grid-matrix {
+  background-image:
+    linear-gradient(to right, rgba(255, 106, 0, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 106, 0, 0.1) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 106, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 106, 0, 0.04) 1px, transparent 1px);
+}
+
+.rg-store-theme .rg-atmosphere::before {
+  background:
+    radial-gradient(55% 40% at 18% 8%, rgba(255, 106, 0, 0.1), transparent 60%),
+    radial-gradient(45% 40% at 85% 92%, rgba(255, 106, 0, 0.07), transparent 60%),
+    radial-gradient(80% 60% at 50% 50%, var(--rg-void-2), var(--rg-void) 70%);
+}
+
+/* "BLACK MARKET" title — plain white, orange glow, no glitch layers */
+.rg-market-title {
+  color: #fdfdff;
+  text-shadow:
+    0 0 10px rgba(255, 106, 0, 0.85),
+    0 0 24px rgba(255, 106, 0, 0.5),
+    0 0 46px rgba(255, 106, 0, 0.28);
+  animation: rg-neo-pulse 3.4s ease-in-out infinite;
+}
+
+/* restricted-access notice — simple bordered orange box */
+.rg-market-warning {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  padding: 6px 20px;
+  color: var(--rg-red);
+  border: 1px solid var(--rg-red-line);
+}
+
+/* big terminal-style CTA button, cut corners like a targeting reticle */
+.rg-market-btn {
+  position: relative;
+  font-size: clamp(14px, 2.5vw, 20px);
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  padding: 18px 50px;
+  background: transparent;
+  border: 2px solid var(--rg-red);
+  color: var(--rg-red);
+  text-shadow: 0 0 12px rgba(255, 106, 0, 0.7);
+  box-shadow: 0 0 20px rgba(255, 106, 0, 0.2), inset 0 0 20px rgba(255, 106, 0, 0.05);
+  transition: background 200ms ease, box-shadow 200ms ease;
+}
+
+.rg-market-btn:hover:not(:disabled) {
+  background: rgba(255, 106, 0, 0.15);
+  box-shadow: 0 0 40px rgba(255, 106, 0, 0.5), inset 0 0 30px rgba(255, 106, 0, 0.12);
+}
+
+.rg-market-btn::before,
+.rg-market-btn::after {
+  content: "";
+  position: absolute;
+  width: 30px;
+  height: 2px;
+  background: var(--rg-void);
+}
+
+.rg-market-btn::before {
+  top: -2px;
+  left: 12px;
+}
+
+.rg-market-btn::after {
+  bottom: -2px;
+  right: 12px;
 }
 
 * {
@@ -155,6 +264,10 @@ button {
 
 .rg-glow-orange {
   text-shadow: 0 0 12px rgba(255, 176, 0, 0.45);
+}
+
+.rg-glow-purple {
+  text-shadow: 0 0 14px rgba(176, 38, 255, 0.5);
 }
 
 .rg-blink {

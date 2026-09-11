@@ -3,6 +3,7 @@ import { JetBrains_Mono } from "next/font/google";
 import { AudioProvider } from "@/lib/audio";
 import BinaryRain from "@/components/decor/BinaryRain";
 import GhostCode from "@/components/decor/GhostCode";
+import StoreThemeEffect from "@/components/StoreThemeEffect";
 import "./globals.css";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es" className={`${jetbrainsMono.variable} h-full`}>
       <body className="min-h-full antialiased">
+        <StoreThemeEffect />
         <AudioProvider>
           <div className="rg-atmosphere" aria-hidden="true" />
           <BinaryRain />
