@@ -6,12 +6,28 @@
     "type": "ROBOTICS",
     "status": "WIP",
     "category": "COMBAT",
-    "systems": ["MECHANICAL", "ELECTRONICS", "SOFTWARE"],
+    "systems": [
+      "MECHANICAL",
+      "ELECTRONICS",
+      "SOFTWARE"
+    ],
     "specs": [
-      ["MCU", "ESP32-S3"],
-      ["DRIVE", "DUAL DC 12V"],
-      ["CHASSIS", "6061 ALUMINUM"],
-      ["WEIGHT", "1.4KG"]
+      [
+        "MCU",
+        "ESP32-S3"
+      ],
+      [
+        "DRIVE",
+        "DUAL DC 12V"
+      ],
+      [
+        "CHASSIS",
+        "6061 ALUMINUM"
+      ],
+      [
+        "WEIGHT",
+        "1.4KG"
+      ]
     ],
     "summary": "Robot de combate en desarrollo. Chasis, control y firmware propios.",
     "description": [
@@ -24,7 +40,12 @@
     "failures": 7,
     "lastModified": "2026-09-09T16:38:00",
     "pipeline": "build",
-    "git": { "repo": "github.com/RedGhost-DiD/mk47", "commits": 62, "branch": "main", "latest": "fix: gripper servo timing" }
+    "git": {
+      "repo": "github.com/RedGhost-DiD/mk47",
+      "commits": 62,
+      "branch": "main",
+      "latest": "fix: gripper servo timing"
+    }
   },
   {
     "slug": "robot-soccer",
@@ -33,12 +54,28 @@
     "type": "ROBOTICS",
     "status": "TESTING",
     "category": "SOCCER",
-    "systems": ["MECHANICAL", "CONTROL", "AI"],
+    "systems": [
+      "MECHANICAL",
+      "CONTROL",
+      "AI"
+    ],
     "specs": [
-      ["MCU", "ESP32-S3"],
-      ["VISION", "OV3660"],
-      ["SENSORS", "TCS34725 ×4"],
-      ["MOTOR", "L298N ×2"]
+      [
+        "MCU",
+        "ESP32-S3"
+      ],
+      [
+        "VISION",
+        "OV3660"
+      ],
+      [
+        "SENSORS",
+        "TCS34725 ×4"
+      ],
+      [
+        "MOTOR",
+        "L298N ×2"
+      ]
     ],
     "summary": "Robot autónomo para fútbol de robots: visión, estrategia y control de movimiento.",
     "description": [
@@ -50,7 +87,12 @@
     "failures": 3,
     "lastModified": "2026-09-08T11:05:00",
     "pipeline": "test",
-    "git": { "repo": "github.com/RedGhost-DiD/robot-soccer", "commits": 118, "branch": "main", "latest": "tune: vision threshold under low light" }
+    "git": {
+      "repo": "github.com/RedGhost-DiD/robot-soccer",
+      "commits": 118,
+      "branch": "main",
+      "latest": "tune: vision threshold under low light"
+    }
   },
   {
     "slug": "redghost-os",
@@ -58,12 +100,28 @@
     "name": "REDGHOST.OS",
     "type": "SOFTWARE",
     "status": "ACTIVE",
-    "stack": ["TYPESCRIPT", "NEXT.JS", "TAILWIND"],
+    "stack": [
+      "TYPESCRIPT",
+      "NEXT.JS",
+      "TAILWIND"
+    ],
     "specs": [
-      ["FRAMEWORK", "NEXT.JS 16"],
-      ["RUNTIME", "NODE 22 / EDGE"],
-      ["STYLING", "TAILWIND V4"],
-      ["LANG", "TYPESCRIPT"]
+      [
+        "FRAMEWORK",
+        "NEXT.JS 16"
+      ],
+      [
+        "RUNTIME",
+        "NODE 22 / EDGE"
+      ],
+      [
+        "STYLING",
+        "TAILWIND V4"
+      ],
+      [
+        "LANG",
+        "TYPESCRIPT"
+      ]
     ],
     "summary": "El sistema que estás viendo ahora mismo.",
     "description": [
@@ -75,7 +133,12 @@
     "failures": 0,
     "lastModified": "2026-09-09T21:10:00",
     "pipeline": "iterate",
-    "git": { "repo": "github.com/RedGhost-DiD/redghost-os", "commits": 231, "branch": "main", "latest": "feat: breach protocol minigame" }
+    "git": {
+      "repo": "github.com/RedGhost-DiD/redghost-os",
+      "commits": 231,
+      "branch": "main",
+      "latest": "feat: breach protocol minigame"
+    }
   },
   {
     "slug": "sensor-node",
@@ -83,12 +146,28 @@
     "name": "SENSOR NODE",
     "type": "HARDWARE",
     "status": "PROTOTYPE",
-    "systems": ["ESP32", "SENSORS", "PCB"],
+    "systems": [
+      "ESP32",
+      "SENSORS",
+      "PCB"
+    ],
     "specs": [
-      ["MCU", "ESP32-WROOM-32"],
-      ["SENSOR", "BME280"],
-      ["RADIO", "LORA SX1276"],
-      ["POWER", "18650 LI-ION"]
+      [
+        "MCU",
+        "ESP32-WROOM-32"
+      ],
+      [
+        "SENSOR",
+        "BME280"
+      ],
+      [
+        "RADIO",
+        "LORA SX1276"
+      ],
+      [
+        "POWER",
+        "18650 LI-ION"
+      ]
     ],
     "summary": "Nodo de sensores inalámbrico basado en ESP32.",
     "description": [
@@ -100,7 +179,12 @@
     "failures": 2,
     "lastModified": "2026-09-07T09:20:00",
     "pipeline": "build",
-    "git": { "repo": "github.com/RedGhost-DiD/sensor-node", "commits": 34, "branch": "main", "latest": "fix: thermal shutdown threshold" },
+    "git": {
+      "repo": "github.com/RedGhost-DiD/sensor-node",
+      "commits": 34,
+      "branch": "main",
+      "latest": "fix: thermal shutdown threshold"
+    },
     "postmortem": {
       "problem": "El primer prototipo se sobrecalentaba en corridas largas.",
       "cause": "Mala gestión térmica en el módulo ESP32.",
@@ -114,12 +198,27 @@
     "name": "GLITCH UI KIT",
     "type": "DESIGN",
     "status": "EXPERIMENTAL",
-    "stack": ["FIGMA", "SVG"],
+    "stack": [
+      "FIGMA",
+      "SVG"
+    ],
     "specs": [
-      ["TOOL", "FIGMA"],
-      ["EXPORT", "SVG / REACT"],
-      ["TOKENS", "42"],
-      ["COMPONENTS", "18"]
+      [
+        "TOOL",
+        "FIGMA"
+      ],
+      [
+        "EXPORT",
+        "SVG / REACT"
+      ],
+      [
+        "TOKENS",
+        "42"
+      ],
+      [
+        "COMPONENTS",
+        "18"
+      ]
     ],
     "summary": "Kit de componentes de interfaz con estética glitch/cyberpunk.",
     "description": [
@@ -139,12 +238,26 @@
     "type": "ROBOTICS",
     "status": "FAILED",
     "category": "EXPERIMENTAL",
-    "systems": ["MECHANICAL"],
+    "systems": [
+      "MECHANICAL"
+    ],
     "specs": [
-      ["MCU", "STM32F103"],
-      ["ACTUATORS", "3× MG996R"],
-      ["LINKS", "3-DOF"],
-      ["RESULT", "RETIRED"]
+      [
+        "MCU",
+        "STM32F103"
+      ],
+      [
+        "ACTUATORS",
+        "3× MG996R"
+      ],
+      [
+        "LINKS",
+        "3-DOF"
+      ],
+      [
+        "RESULT",
+        "RETIRED"
+      ]
     ],
     "summary": "Brazo articulado de bajo costo — retirado tras fallos mecánicos repetidos.",
     "description": [
@@ -162,5 +275,35 @@
       "fix": "—",
       "result": "Retirado. La geometría importa."
     }
+  },
+  {
+    "slug": "TestLol",
+    "id": "RG//MK-027",
+    "name": "Prueba",
+    "type": "SOFTWARE",
+    "status": "TESTING",
+    "summary": "PRUEBA DE TOKEN Y EDICION",
+    "description": [
+      "Prueba de token para validar que nadie mas edite la web"
+    ],
+    "revision": "01",
+    "build": 1,
+    "tests": 1,
+    "failures": 0,
+    "lastModified": "2026-09-11T22:36:28.879Z",
+    "pipeline": "test",
+    "category": "comprobacion de edicion",
+    "systems": [
+      "SOFWARE"
+    ],
+    "stack": [
+      "GITHUB"
+    ],
+    "specs": [
+      [
+        "GITHUB",
+        "TOKEN TEST"
+      ]
+    ]
   }
 ]
