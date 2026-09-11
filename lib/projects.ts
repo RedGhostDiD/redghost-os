@@ -1,3 +1,5 @@
+import projectsData from "@/data/projects.json";
+
 export type ProjectType = "ROBOTICS" | "SOFTWARE" | "HARDWARE" | "DESIGN";
 
 export type ProjectStatus =
@@ -34,6 +36,8 @@ export interface Project {
   category?: string;
   systems?: string[];
   stack?: string[];
+  /** Public path to a thumbnail image, e.g. "/uploads/proyectos/mk47.jpg". */
+  image?: string;
   /** Real engineering spec lines, e.g. ["MCU", "ESP32-S3"] — shown as a small spec sheet. */
   specs?: [string, string][];
   summary: string;
@@ -55,8 +59,6 @@ const CATEGORY_CODE: Record<ProjectType, string> = {
   HARDWARE: "HW",
   DESIGN: "DS",
 };
-
-import projectsData from "@/data/projects.json";
 
 /**
  * Project database. Sourced from data/projects.json — every module page

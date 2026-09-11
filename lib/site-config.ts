@@ -1,26 +1,23 @@
+import siteConfigData from "@/data/site-config.json";
+
+export interface SocialLink {
+  label: string;
+  href: string;
+  handle?: string;
+  avatar?: string;
+}
+
+export interface SiteConfig {
+  email: string;
+  socials: SocialLink[];
+  buildVersion: string;
+  didBrandVersion: string;
+  lastSystemUpdate: string;
+}
+
 /**
- * Single source of truth for contact + social links, used by /redes and
- * /contacto. Everything here is a placeholder — edit freely.
+ * Single source of truth for contact + social links, used by /redes,
+ * /contacto and the /inicio dashboard. Sourced from data/site-config.json —
+ * editable by hand or via the /admin/redes panel.
  */
-export const SITE_CONFIG = {
-  email: "contacto@redghost.site",
-  socials: [
-    {
-      label: "GITHUB",
-      handle: "RedGhostDiD",
-      href: "https://github.com/RedGhostDiD",
-      avatar: "/social/github.png",
-    },
-    {
-      label: "INSTAGRAM",
-      handle: "@redghost.did",
-      href: "https://www.instagram.com/redghost.did/",
-      avatar: "/social/instagram.jpg",
-    },
-    { label: "YOUTUBE", href: "#" },
-    { label: "TIKTOK", href: "#" },
-  ] as { label: string; href: string; handle?: string; avatar?: string }[],
-  buildVersion: "2026.09.10",
-  didBrandVersion: "v2.7.14",
-  lastSystemUpdate: "2026.09.10 // 17:42",
-};
+export const SITE_CONFIG: SiteConfig = siteConfigData as SiteConfig;

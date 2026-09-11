@@ -19,7 +19,7 @@ export default async function EditarProyectoPage({
       <h1 className="text-sm tracking-[0.2em]" style={{ color: "var(--rg-red)" }}>
         EDITAR // {project.name}
       </h1>
-      <ProjectForm initial={project} />
+      <ProjectForm initial={project} existingProjects={projects} />
     </>
   );
 }

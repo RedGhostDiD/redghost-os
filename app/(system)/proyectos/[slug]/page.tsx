@@ -46,6 +46,16 @@ export default async function ProjectDetailPage({
           ))}
         </div>
 
+        {project.image && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={project.image}
+            alt={project.name}
+            className="w-full max-h-72 object-cover border mb-4"
+            style={{ borderColor: "var(--rg-red-line)" }}
+          />
+        )}
+
         <h1 className="text-xl tracking-[0.2em] text-[var(--rg-red)] rg-glow-red mb-1">
           {project.name}
         </h1>

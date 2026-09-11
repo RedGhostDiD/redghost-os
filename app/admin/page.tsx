@@ -8,6 +8,10 @@ export const dynamic = "force-dynamic";
 export default async function AdminPage() {
   const session = await auth();
   const { projects } = await readProjects();
+  const owner = process.env.GITHUB_REPO_OWNER;
+  const repo = process.env.GITHUB_REPO_NAME;
+  const branch = process.env.GITHUB_BRANCH || "main";
+  const historyUrl = owner && repo ? `https://github.com/${owner}/${repo}/commits/${branch}/data/projects.json` : null;
 
   return (
     <>
@@ -36,13 +40,33 @@ export default async function AdminPage() {
         </form>
       </div>
 
-      <Link
-        href="/admin/nuevo"
-        className="text-xs tracking-[0.15em] self-start px-4 py-2.5 border"
-        style={{ borderColor: "var(--rg-red)", color: "var(--rg-red-soft)" }}
-      >
-        + NUEVO PROYECTO
-      </Link>
+      <div className="flex flex-wrap gap-2">
+        <Link
+          href="/admin/nuevo"
+          className="text-xs tracking-[0.15em] px-4 py-2.5 border"
+          style={{ borderColor: "var(--rg-red)", color: "var(--rg-red-soft)" }}
+        >
+          + NUEVO PROYECTO
+        </Link>
+        <Link
+          href="/admin/redes"
+          className="text-xs tracking-[0.15em] px-4 py-2.5 border"
+          style={{ borderColor: "var(--rg-red-line)", color: "var(--rg-text-dim)" }}
+        >
+          EDITAR REDES / CONTACTO
+        </Link>
+        {historyUrl && (
+          <a
+            href={historyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs tracking-[0.15em] px-4 py-2.5 border"
+            style={{ borderColor: "var(--rg-red-line)", color: "var(--rg-text-faint)" }}
+          >
+            VER HISTORIAL EN GITHUB
+          </a>
+        )}
+      </div>
 
       <ProjectList projects={projects} />
     </>

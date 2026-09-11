@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Project, ProjectType, ProjectStatus, PipelineStage } from "@/lib/projects";
+import { nextProjectId } from "@/lib/projects";
 
 const TYPES: ProjectType[] = ["ROBOTICS", "SOFTWARE", "HARDWARE", "DESIGN"];
 const STATUSES: ProjectStatus[] = [
@@ -23,17 +24,42 @@ function toSpecRows(specs?: [string, string][]): SpecRow[] {
   return specs.map(([key, value]) => ({ key, value }));
 }
 
-interface Props {
-  initial?: Project;
+const DIACRITICS_RE = new RegExp("[\\u0300-\\u036f]", "g");
+
+function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(DIACRITICS_RE, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
-export default function ProjectForm({ initial }: Props) {
+function suggestId(type: ProjectType, existing: Project[]): string {
+  const nums = existing
+    .filter((p) => p.type === type)
+    .map((p) => {
+      const m = p.id.match(/(\d+)$/);
+      return m ? parseInt(m[1], 10) : 0;
+    });
+  const next = (nums.length ? Math.max(...nums) : 0) + 1;
+  return nextProjectId(type, next);
+}
+
+interface Props {
+  initial?: Project;
+  existingProjects: Project[];
+}
+
+export default function ProjectForm({ initial, existingProjects }: Props) {
   const router = useRouter();
   const isEdit = !!initial;
   const originalSlug = initial?.slug;
 
   const [slug, setSlug] = useState(initial?.slug ?? "");
-  const [id, setId] = useState(initial?.id ?? "");
+  const [slugTouched, setSlugTouched] = useState(isEdit);
+  const [id, setId] = useState(initial?.id ?? (isEdit ? "" : suggestId("ROBOTICS", existingProjects)));
+  const [idTouched, setIdTouched] = useState(isEdit);
   const [name, setName] = useState(initial?.name ?? "");
   const [type, setType] = useState<ProjectType>(initial?.type ?? "ROBOTICS");
   const [status, setStatus] = useState<ProjectStatus>(initial?.status ?? "WIP");
@@ -57,11 +83,62 @@ export default function ProjectForm({ initial }: Props) {
   const [pmFix, setPmFix] = useState(initial?.postmortem?.fix ?? "");
   const [pmResult, setPmResult] = useState(initial?.postmortem?.result ?? "");
 
+  const [existingImage, setExistingImage] = useState(initial?.image ?? "");
+  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
+  const [imageExt, setImageExt] = useState<string>("jpg");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dirty, setDirty] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (!dirty) return;
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [dirty]);
+
+  function handleNameChange(value: string) {
+    setName(value);
+    if (!isEdit && !slugTouched) setSlug(slugify(value));
+  }
+
+  function handleTypeChange(value: ProjectType) {
+    setType(value);
+    if (!isEdit && !idTouched) setId(suggestId(value, existingProjects));
+  }
 
   function updateSpecRow(i: number, field: "key" | "value", value: string) {
     setSpecRows((rows) => rows.map((r, idx) => (idx === i ? { ...r, [field]: value } : r)));
+  }
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    setImageExt(ext);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImageDataUrl(reader.result as string);
+      setDirty(true);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeImage() {
+    setExistingImage("");
+    setImageDataUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setDirty(true);
+  }
+
+  function goBack() {
+    if (dirty && !confirm("Tenés cambios sin guardar. ¿Salir igual?")) return;
+    router.push("/admin");
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -69,55 +146,72 @@ export default function ProjectForm({ initial }: Props) {
     setSaving(true);
     setError(null);
 
-    const specs = specRows
-      .filter((r) => r.key.trim() && r.value.trim())
-      .map((r) => [r.key.trim(), r.value.trim()] as [string, string]);
-
-    const project: Project = {
-      slug: slug.trim(),
-      id: id.trim(),
-      name: name.trim(),
-      type,
-      status,
-      summary: summary.trim(),
-      description: description
-        .split("\n")
-        .map((l) => l.trim())
-        .filter(Boolean),
-      revision: revision.trim(),
-      build: Number(build) || 0,
-      tests: Number(tests) || 0,
-      failures: Number(failures) || 0,
-      lastModified: initial?.lastModified ?? new Date().toISOString(),
-      pipeline,
-    };
-
-    if (category.trim()) project.category = category.trim();
-    const systemsArr = systems.split(",").map((s) => s.trim()).filter(Boolean);
-    if (systemsArr.length) project.systems = systemsArr;
-    const stackArr = stack.split(",").map((s) => s.trim()).filter(Boolean);
-    if (stackArr.length) project.stack = stackArr;
-    if (specs.length) project.specs = specs;
-
-    if (gitRepo.trim() || gitLatest.trim()) {
-      project.git = {
-        repo: gitRepo.trim(),
-        commits: Number(gitCommits) || 0,
-        branch: gitBranch.trim() || "main",
-        latest: gitLatest.trim(),
-      };
-    }
-
-    if (pmProblem.trim() || pmCause.trim() || pmFix.trim() || pmResult.trim()) {
-      project.postmortem = {
-        problem: pmProblem.trim(),
-        cause: pmCause.trim(),
-        fix: pmFix.trim(),
-        result: pmResult.trim(),
-      };
-    }
-
     try {
+      const specs = specRows
+        .filter((r) => r.key.trim() && r.value.trim())
+        .map((r) => [r.key.trim(), r.value.trim()] as [string, string]);
+
+      const project: Project = {
+        slug: slug.trim(),
+        id: id.trim(),
+        name: name.trim(),
+        type,
+        status,
+        summary: summary.trim(),
+        description: description
+          .split("\n")
+          .map((l) => l.trim())
+          .filter(Boolean),
+        revision: revision.trim(),
+        build: Number(build) || 0,
+        tests: Number(tests) || 0,
+        failures: Number(failures) || 0,
+        lastModified: initial?.lastModified ?? new Date().toISOString(),
+        pipeline,
+      };
+
+      if (category.trim()) project.category = category.trim();
+      const systemsArr = systems.split(",").map((s) => s.trim()).filter(Boolean);
+      if (systemsArr.length) project.systems = systemsArr;
+      const stackArr = stack.split(",").map((s) => s.trim()).filter(Boolean);
+      if (stackArr.length) project.stack = stackArr;
+      if (specs.length) project.specs = specs;
+
+      if (gitRepo.trim() || gitLatest.trim()) {
+        project.git = {
+          repo: gitRepo.trim(),
+          commits: Number(gitCommits) || 0,
+          branch: gitBranch.trim() || "main",
+          latest: gitLatest.trim(),
+        };
+      }
+
+      if (pmProblem.trim() || pmCause.trim() || pmFix.trim() || pmResult.trim()) {
+        project.postmortem = {
+          problem: pmProblem.trim(),
+          cause: pmCause.trim(),
+          fix: pmFix.trim(),
+          result: pmResult.trim(),
+        };
+      }
+
+      if (imageDataUrl) {
+        const base64 = imageDataUrl.split(",")[1] ?? "";
+        const uploadRes = await fetch("/api/admin/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            path: `proyectos/${project.slug}.${imageExt}`,
+            contentBase64: base64,
+          }),
+        });
+        const uploadData = await uploadRes.json();
+        if (!uploadRes.ok) throw new Error(uploadData.error ?? "Error al subir la imagen");
+        project.image = uploadData.path;
+      } else if (existingImage) {
+        project.image = existingImage;
+      }
+
       const res = await fetch("/api/admin/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -125,6 +219,7 @@ export default function ProjectForm({ initial }: Props) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Error al guardar");
+      setDirty(false);
       router.push("/admin");
       router.refresh();
     } catch (err) {
@@ -141,7 +236,11 @@ export default function ProjectForm({ initial }: Props) {
   const labelStyle = { color: "var(--rg-text-faint)" };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form
+      onSubmit={handleSubmit}
+      onChangeCapture={() => setDirty(true)}
+      className="flex flex-col gap-4"
+    >
       {error && (
         <p
           className="text-xs tracking-[0.05em] border px-3 py-2"
@@ -151,26 +250,90 @@ export default function ProjectForm({ initial }: Props) {
         </p>
       )}
 
+      <div>
+        <label className={labelClass} style={labelStyle}>IMAGEN (opcional)</label>
+        <div className="flex items-center gap-3">
+          {(imageDataUrl || existingImage) && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imageDataUrl || existingImage}
+              alt=""
+              className="w-16 h-16 object-cover border"
+              style={{ borderColor: "var(--rg-red-line)" }}
+            />
+          )}
+          <div className="flex flex-col gap-1.5">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              onChange={handleImageChange}
+              className="text-[10px]"
+              style={{ color: "var(--rg-text-faint)" }}
+            />
+            {(imageDataUrl || existingImage) && (
+              <button
+                type="button"
+                onClick={removeImage}
+                className="text-[10px] tracking-[0.1em] self-start px-2 py-1 border"
+                style={{ borderColor: "var(--rg-red-line)", color: "var(--rg-text-faint)" }}
+              >
+                QUITAR IMAGEN
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
       <div className="grid sm:grid-cols-2 gap-3">
         <div>
           <label className={labelClass} style={labelStyle}>SLUG</label>
-          <input className={inputClass} style={inputStyle} value={slug} onChange={(e) => setSlug(e.target.value)} required />
+          <input
+            className={inputClass}
+            style={inputStyle}
+            value={slug}
+            onChange={(e) => {
+              setSlug(e.target.value);
+              setSlugTouched(true);
+            }}
+            required
+          />
         </div>
         <div>
           <label className={labelClass} style={labelStyle}>ID (ej. RG//RB-047)</label>
-          <input className={inputClass} style={inputStyle} value={id} onChange={(e) => setId(e.target.value)} required />
+          <input
+            className={inputClass}
+            style={inputStyle}
+            value={id}
+            onChange={(e) => {
+              setId(e.target.value);
+              setIdTouched(true);
+            }}
+            required
+          />
         </div>
       </div>
 
       <div>
         <label className={labelClass} style={labelStyle}>NOMBRE</label>
-        <input className={inputClass} style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} required />
+        <input
+          className={inputClass}
+          style={inputStyle}
+          value={name}
+          onChange={(e) => handleNameChange(e.target.value)}
+          required
+        />
       </div>
 
       <div className="grid sm:grid-cols-3 gap-3">
         <div>
           <label className={labelClass} style={labelStyle}>TIPO</label>
-          <select className={inputClass} style={inputStyle} value={type} onChange={(e) => setType(e.target.value as ProjectType)}>
+          <select
+            className={inputClass}
+            style={inputStyle}
+            value={type}
+            onChange={(e) => handleTypeChange(e.target.value as ProjectType)}
+          >
             {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
         </div>
@@ -316,7 +479,7 @@ export default function ProjectForm({ initial }: Props) {
         </button>
         <button
           type="button"
-          onClick={() => router.push("/admin")}
+          onClick={goBack}
           className="text-xs tracking-[0.15em] px-4 py-2.5 border"
           style={{ borderColor: "var(--rg-red-line)", color: "var(--rg-text-faint)" }}
         >

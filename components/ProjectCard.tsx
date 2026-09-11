@@ -20,6 +20,16 @@ export default function ProjectCard({
       status={{ label: project.status, tone: STATUS_TONE[project.status] }}
       delayMs={delayMs}
     >
+      {project.image && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={project.image}
+          alt={project.name}
+          className="w-full h-32 object-cover border mb-3"
+          style={{ borderColor: "var(--rg-red-line)" }}
+        />
+      )}
+
       <h3 className="text-sm tracking-[0.15em] text-[var(--rg-text)] mb-1">
         {project.name}
         <span className="ml-2 text-[10px] tracking-[0.1em]" style={{ color: "var(--rg-text-faint)" }}>
