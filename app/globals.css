@@ -100,9 +100,12 @@
 /* restricted-access notice — simple bordered orange box */
 .rg-market-warning {
   display: inline-block;
-  font-size: 11px;
+  max-width: 100%;
+  white-space: nowrap;
+  /* Fluid so the line never wraps: shrinks with viewport width instead. */
+  font-size: clamp(6px, 2.4vw, 11px);
   letter-spacing: 0.2em;
-  padding: 6px 20px;
+  padding: 6px clamp(8px, 4vw, 20px);
   color: var(--rg-red);
   border: 1px solid var(--rg-red-line);
 }
