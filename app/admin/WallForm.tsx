@@ -152,7 +152,7 @@ export default function WallForm({ initial, existingPosts, projects }: Props) {
         {id} {isEdit ? "" : "(se asigna automáticamente)"}
       </p>
 
-      <div className="grid sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label className={labelClass} style={labelStyle}>TYPE</label>
           <select className={inputClass} style={inputStyle} value={type} onChange={(e) => setType(e.target.value as WallContentType)}>

@@ -287,7 +287,7 @@ export default function ProjectForm({ initial, existingProjects }: Props) {
         </div>
       </div>
 
-      <div className="grid sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className={labelClass} style={labelStyle}>SLUG</label>
           <input
@@ -327,7 +327,7 @@ export default function ProjectForm({ initial, existingProjects }: Props) {
         />
       </div>
 
-      <div className="grid sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label className={labelClass} style={labelStyle}>TIPO</label>
           <select
@@ -363,7 +363,7 @@ export default function ProjectForm({ initial, existingProjects }: Props) {
         OCULTAR DE LA PÁGINA PRINCIPAL (queda guardado, pero no aparece en el sitio público)
       </label>
 
-      <div className="grid sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className={labelClass} style={labelStyle}>SYSTEMS (separado por comas)</label>
           <input className={inputClass} style={inputStyle} value={systems} onChange={(e) => setSystems(e.target.value)} placeholder="MECHANICAL, ELECTRONICS" />
@@ -424,7 +424,7 @@ export default function ProjectForm({ initial, existingProjects }: Props) {
         <textarea className={inputClass} style={{ ...inputStyle, minHeight: 100 }} value={description} onChange={(e) => setDescription(e.target.value)} />
       </div>
 
-      <div className="grid sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <div>
           <label className={labelClass} style={labelStyle}>REVISIÓN</label>
           <input className={inputClass} style={inputStyle} value={revision} onChange={(e) => setRevision(e.target.value)} />
@@ -445,7 +445,7 @@ export default function ProjectForm({ initial, existingProjects }: Props) {
 
       <fieldset className="border p-3" style={{ borderColor: "var(--rg-red-line)" }}>
         <legend className="text-[10px] tracking-[0.15em] px-1" style={labelStyle}>GIT (opcional)</legend>
-        <div className="grid sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className={labelClass} style={labelStyle}>REPO</label>
             <input className={inputClass} style={inputStyle} value={gitRepo} onChange={(e) => setGitRepo(e.target.value)} placeholder="github.com/RedGhostDiD/proyecto" />

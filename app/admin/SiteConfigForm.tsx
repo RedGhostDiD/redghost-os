@@ -160,7 +160,7 @@ export default function SiteConfigForm({ initial }: { initial: SiteConfig }) {
         <label className={labelClass} style={labelStyle}>REDES SOCIALES</label>
         {socials.map((row, i) => (
           <fieldset key={i} className="border p-3 flex flex-col gap-2" style={{ borderColor: "var(--rg-red-line)" }}>
-            <div className="grid sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div>
                 <label className={labelClass} style={labelStyle}>LABEL</label>
                 <input className={inputClass} style={inputStyle} value={row.label} onChange={(e) => updateRow(i, { label: e.target.value })} placeholder="YOUTUBE" />

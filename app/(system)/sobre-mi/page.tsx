@@ -127,7 +127,7 @@ export default function SobreMiPage() {
         <p className="text-[10px] tracking-[0.15em] mb-2" style={{ color: "var(--rg-text-faint)" }}>
           TECHNICAL
         </p>
-        <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-0.5 text-sm text-[var(--rg-text-dim)] mb-5">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0.5 text-sm text-[var(--rg-text-dim)] mb-5">
           {FORMATION_TECHNICAL.map((item) => (
             <li key={item}>+ {item}</li>
           ))}
@@ -209,7 +209,7 @@ export default function SobreMiPage() {
       </Panel>
 
       <Panel id="MOD_088" title="Current System" delayMs={640}>
-        <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-1.5 text-[10px] tracking-[0.1em]">
+        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-[10px] tracking-[0.1em]">
           {CURRENT_SYSTEM.map(([label, value]) => (
             <div key={label} className="flex items-baseline justify-between gap-2">
               <dt style={{ color: "var(--rg-text-faint)" }}>{label}</dt>
@@ -220,7 +220,7 @@ export default function SobreMiPage() {
       </Panel>
 
       <Panel id="MOD_089" title="D.I.D" delayMs={720}>
-        <div className="grid sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-2 text-sm text-[var(--rg-text-dim)] leading-relaxed">
             <p>
               <span style={{ color: "var(--rg-red)" }}>DIBUJO</span> para imaginar y diseñar.

@@ -167,7 +167,7 @@ export default function InicioPage() {
         </Panel>
 
         <Panel id="MOD_003" title="Project Database" status={{ label: "LIVE", tone: "red-dim" }} delayMs={420}>
-          <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
             <div>
               <p className="text-[10px] tracking-[0.15em] mb-2" style={{ color: "var(--rg-text-faint)" }}>
                 BY STATUS
