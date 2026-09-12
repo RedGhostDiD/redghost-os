@@ -9,8 +9,8 @@ export default async function AdminMuroPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-sm tracking-[0.2em]" style={{ color: "var(--rg-red)" }}>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-sm tracking-[0.2em] break-words min-w-0" style={{ color: "var(--rg-red)" }}>
           ADMIN // RG//WALL
         </h1>
         <Link

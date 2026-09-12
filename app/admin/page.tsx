@@ -15,9 +15,9 @@ export default async function AdminPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-sm tracking-[0.2em]" style={{ color: "var(--rg-red)" }}>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-sm tracking-[0.2em] break-words" style={{ color: "var(--rg-red)" }}>
             ADMIN // PROJECT DATABASE
           </h1>
           <p className="text-[10px] tracking-[0.1em] mt-1" style={{ color: "var(--rg-text-faint)" }}>
