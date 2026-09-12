@@ -322,6 +322,7 @@
     "name": "SENSOR NODE",
     "type": "HARDWARE",
     "status": "PROTOTYPE",
+    "hidden": true,
     "systems": [
       "ESP32",
       "SENSORS",
