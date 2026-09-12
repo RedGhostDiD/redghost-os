@@ -113,10 +113,13 @@
 /* big terminal-style CTA button, cut corners like a targeting reticle */
 .rg-market-btn {
   position: relative;
-  font-size: clamp(14px, 2.5vw, 20px);
+  max-width: 100%;
+  white-space: nowrap;
+  /* Fluid so the label never wraps to a second line. */
+  font-size: clamp(8px, 3.4vw, 20px);
   font-weight: 700;
   letter-spacing: 0.25em;
-  padding: 18px 50px;
+  padding: clamp(10px, 3vw, 18px) clamp(14px, 4vw, 50px);
   background: transparent;
   border: 2px solid var(--rg-red);
   color: var(--rg-red);
@@ -169,6 +172,15 @@
   50% { color: var(--rg-green); }
   75% { color: var(--rg-purple); }
   100% { color: var(--rg-red); }
+}
+
+.rg-market-footer {
+  max-width: 100%;
+  white-space: nowrap;
+  /* Fluid so "ALL ITEMS // DESIGNED / BUILT / DISTRIBUTED BY REDGHOST"
+     never wraps to a second line. */
+  font-size: clamp(5px, 2.2vw, 8px);
+  letter-spacing: 0.2em;
 }
 
 .rg-store-offline {

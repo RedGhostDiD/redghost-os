@@ -50,10 +50,7 @@ export default function StorePage() {
         {CATEGORIES.join(" · ")}
       </p>
 
-      <p
-        className="mt-10 text-[8px] tracking-[0.2em]"
-        style={{ color: "var(--rg-text-faint)" }}
-      >
+      <p className="rg-market-footer mt-10" style={{ color: "var(--rg-text-faint)" }}>
         ALL ITEMS // DESIGNED / BUILT / DISTRIBUTED BY REDGHOST
       </p>
     </div>
