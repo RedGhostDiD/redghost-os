@@ -1,9 +1,11 @@
 import { Octokit } from "@octokit/rest";
 import type { Project } from "@/lib/projects";
 import type { SiteConfig } from "@/lib/site-config";
+import type { WallPost } from "@/lib/wall";
 
 const PROJECTS_PATH = "data/projects.json";
 const SITE_CONFIG_PATH = "data/site-config.json";
+const WALL_PATH = "data/wall.json";
 
 function config() {
   const owner = process.env.GITHUB_REPO_OWNER;
@@ -80,6 +82,15 @@ export async function readSiteConfig(): Promise<{ config: SiteConfig; sha: strin
 
 export async function writeSiteConfig(cfg: SiteConfig, sha: string, message: string): Promise<void> {
   await writeJson(SITE_CONFIG_PATH, cfg, sha, message);
+}
+
+export async function readWallPosts(): Promise<{ posts: WallPost[]; sha: string }> {
+  const { data, sha } = await readJson<WallPost[]>(WALL_PATH);
+  return { posts: data, sha };
+}
+
+export async function writeWallPosts(posts: WallPost[], sha: string, message: string): Promise<void> {
+  await writeJson(WALL_PATH, posts, sha, message);
 }
 
 const UPLOADS_PREFIX = "public/uploads/";

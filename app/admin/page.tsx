@@ -55,6 +55,13 @@ export default async function AdminPage() {
         >
           EDITAR REDES / CONTACTO
         </Link>
+        <Link
+          href="/admin/muro"
+          className="text-xs tracking-[0.15em] px-4 py-2.5 border"
+          style={{ borderColor: "var(--rg-red-line)", color: "var(--rg-text-dim)" }}
+        >
+          RG//WALL
+        </Link>
         {historyUrl && (
           <a
             href={historyUrl}

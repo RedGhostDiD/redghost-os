@@ -16,6 +16,7 @@ import {
   IconDesign,
   IconLab,
   IconStore,
+  IconWall,
   IconGithub,
   IconInstagram,
   IconYoutube,
@@ -39,7 +40,8 @@ const MODULES = [
   { label: "HARDWARE", href: "/hardware", icon: <IconHardware />, readout: "0x04 PCB_OK", tone: "orange" as const },
   { label: "DESIGN", href: "/diseno", icon: <IconDesign />, readout: "0x05 ASSET_OK", tone: "red-dim" as const },
   { label: "LAB", href: "/laboratorio", icon: <IconLab />, readout: "0x06 UNSTABLE", tone: "red" as const },
-  { label: "STORE", href: "/store", icon: <IconStore />, readout: "0x07 OPEN", tone: "green" as const },
+  { label: "WALL", href: "/muro", icon: <IconWall />, readout: "0x07 FEED_LIVE", tone: "green" as const },
+  { label: "STORE", href: "/store", icon: <IconStore />, readout: "0x08 OPEN", tone: "green" as const },
 ];
 
 const STATUS_FLAGS = [

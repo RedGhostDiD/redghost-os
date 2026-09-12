@@ -13,6 +13,7 @@ const MODULES = [
   { label: "HARDWARE", href: "/hardware" },
   { label: "DESIGN", href: "/diseno" },
   { label: "LAB", href: "/laboratorio" },
+  { label: "WALL", href: "/muro" },
   { label: "STORE", href: "/store" },
 ];
 

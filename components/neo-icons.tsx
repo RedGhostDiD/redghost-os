@@ -99,6 +99,16 @@ export function IconInstagram({ className }: IconProps) {
   );
 }
 
+export function IconWall({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <rect x="3" y="4" width="18" height="16" rx="1.5" />
+      <path d="M3 10h18" />
+      <path d="M8 14h4M8 17h8" />
+    </svg>
+  );
+}
+
 export function IconYoutube({ className }: IconProps) {
   return (
     <svg {...base} className={className}>
