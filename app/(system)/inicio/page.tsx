@@ -59,12 +59,58 @@ export default function InicioPage() {
     <BootIntro>
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-5">
+        <Panel id="MOD_000" title="Network" status={{ label: "CONNECTED", tone: "green" }} delayMs={140}>
+          <div className="flex flex-col sm:flex-row items-center gap-5">
+            {mainAvatar && (
+              <span
+                className="relative shrink-0 w-56 h-56 sm:w-40 sm:h-40 overflow-hidden rounded-full border"
+                style={{ borderColor: "var(--rg-red-line)" }}
+              >
+                <Image
+                  src={mainAvatar}
+                  alt="RedGhost"
+                  fill
+                  sizes="(max-width: 640px) 224px, 160px"
+                  className="object-cover"
+                />
+              </span>
+            )}
+            <div className="w-full sm:flex-1 min-w-0 flex flex-col divide-y" style={{ borderColor: "var(--rg-red-line-soft)" }}>
+              {SITE_CONFIG.socials.map((social) => (
+                <div key={social.label} className="flex items-center justify-between gap-2 py-2 first:pt-0">
+                  <span className="flex items-center gap-2 text-xs tracking-[0.12em] min-w-0" style={{ color: "var(--rg-text)" }}>
+                    <span className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--rg-orange)" }}>
+                      {SOCIAL_ICONS[social.label]}
+                    </span>
+                    <span className="truncate">
+                      {social.label}
+                      {social.handle && (
+                        <span className="ml-1.5" style={{ color: "var(--rg-text-faint)" }}>
+                          {social.handle}
+                        </span>
+                      )}
+                    </span>
+                  </span>
+                  <a
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rg-action-link shrink-0 text-[9px] tracking-[0.15em] border px-2 py-1"
+                  >
+                    [ CONNECT ]
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Panel>
+
         {activeProjects.length > 0 && (
           <Panel
-            id="MOD_000"
+            id="MOD_001"
             title="Active Projects"
             status={{ label: "ACTIVE", tone: "green" }}
-            delayMs={140}
+            delayMs={220}
             className="[&_.rg-neo-panel]:border-[var(--rg-red)]"
           >
             <div className="flex flex-col gap-5">
@@ -103,7 +149,7 @@ export default function InicioPage() {
           </Panel>
         )}
 
-        <Panel id="MOD_001" title="System Modules" status={{ label: "ACTIVE", tone: "red-dim" }} delayMs={220}>
+        <Panel id="MOD_002" title="System Modules" status={{ label: "ACTIVE", tone: "red-dim" }} delayMs={280}>
           <div className="flex flex-wrap gap-3">
             {MODULES.map((mod) => (
               <ModuleWidget
@@ -118,7 +164,7 @@ export default function InicioPage() {
           </div>
         </Panel>
 
-        <Panel id="MOD_002" title="Project Database" status={{ label: "LIVE", tone: "red-dim" }} delayMs={280}>
+        <Panel id="MOD_003" title="Project Database" status={{ label: "LIVE", tone: "red-dim" }} delayMs={420}>
           <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
             <div>
               <p className="text-[10px] tracking-[0.15em] mb-2" style={{ color: "var(--rg-text-faint)" }}>
@@ -191,52 +237,6 @@ export default function InicioPage() {
                   <GlitchText text="LAB EXPERIMENTAL" />
                 </div>
               </div>
-            </div>
-          </div>
-        </Panel>
-
-        <Panel id="MOD_003" title="Network" status={{ label: "CONNECTED", tone: "green" }} delayMs={420}>
-          <div className="flex flex-col sm:flex-row items-center gap-5">
-            {mainAvatar && (
-              <span
-                className="relative shrink-0 w-56 h-56 sm:w-40 sm:h-40 overflow-hidden rounded-full border"
-                style={{ borderColor: "var(--rg-red-line)" }}
-              >
-                <Image
-                  src={mainAvatar}
-                  alt="RedGhost"
-                  fill
-                  sizes="(max-width: 640px) 224px, 160px"
-                  className="object-cover"
-                />
-              </span>
-            )}
-            <div className="w-full sm:flex-1 min-w-0 flex flex-col divide-y" style={{ borderColor: "var(--rg-red-line-soft)" }}>
-              {SITE_CONFIG.socials.map((social) => (
-                <div key={social.label} className="flex items-center justify-between gap-2 py-2 first:pt-0">
-                  <span className="flex items-center gap-2 text-xs tracking-[0.12em] min-w-0" style={{ color: "var(--rg-text)" }}>
-                    <span className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--rg-orange)" }}>
-                      {SOCIAL_ICONS[social.label]}
-                    </span>
-                    <span className="truncate">
-                      {social.label}
-                      {social.handle && (
-                        <span className="ml-1.5" style={{ color: "var(--rg-text-faint)" }}>
-                          {social.handle}
-                        </span>
-                      )}
-                    </span>
-                  </span>
-                  <a
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rg-action-link shrink-0 text-[9px] tracking-[0.15em] border px-2 py-1"
-                  >
-                    [ CONNECT ]
-                  </a>
-                </div>
-              ))}
             </div>
           </div>
         </Panel>
