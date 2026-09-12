@@ -60,8 +60,8 @@ export default function StoreThemeEffect() {
 
     if (prev === null || prev === isStore) return;
 
-    flickerBackground(isStore, 25, 60, 2, 2);
-    const cancel = scramblePageText(document.body, 320, 55);
+    flickerBackground(isStore, 15, 35, 2, 2);
+    const cancel = scramblePageText(document.body, 160, 40);
     return cancel;
   }, [pathname]);
 
