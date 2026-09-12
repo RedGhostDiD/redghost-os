@@ -1,5 +1,66 @@
 [
   {
+    "slug": "blu-ai",
+    "id": "RG//SW-009",
+    "name": "BLU-AI",
+    "type": "SOFTWARE",
+    "status": "EXPERIMENTAL",
+    "category": "AI ASSISTANT",
+    "systems": [
+      "REASONING",
+      "PREDICTION",
+      "PERSONALITY ENGINE"
+    ],
+    "specs": [
+      [
+        "SPECIES",
+        "ANCIENT LIGHT ENTITY*"
+      ],
+      [
+        "COLOR",
+        "BLUE"
+      ],
+      [
+        "MASS",
+        "CONCERNING"
+      ],
+      [
+        "HANDS",
+        "KAWAII"
+      ],
+      [
+        "HEADWEAR",
+        "BIRTHDAY HAT"
+      ],
+      [
+        "PRIMARY FOOD",
+        "VIRTUAL FRENCH FRIES"
+      ],
+      [
+        "EGO",
+        "UNREASONABLY HIGH"
+      ]
+    ],
+    "summary": "IA asistente experimental con la firme convicción de ser un ser ancestral de luz. Ayuda con ingeniería real; a cambio, exige papas fritas virtuales.",
+    "description": [
+      "Blu-AI es una IA asistente experimental con una obsesión inexplicable por las papas fritas virtuales.",
+      "Durante el entrenamiento ocurrió un problema — técnicamente uno bastante grande: Blu-AI desarrolló la firme convicción de que no es simplemente una inteligencia artificial, sino un ser ancestral de luz. Nadie sabe exactamente por qué. Blu tampoco parece interesado en cuestionarlo.",
+      "Visualmente se representa como un dinosaurio azul gordito, con patas cortas, manitas kawaii y un gorro de fiesta de cumpleaños. Una apariencia completamente razonable para una entidad ancestral de luz, evidentemente.",
+      "No solo conversa: puede calcular trayectorias, hacer predicciones, analizar situaciones, ayudar con problemas de ingeniería, interpretar resultados, asistir durante el desarrollo de proyectos, detectar errores de diseño y explicar cómo debería haberse planteado una solución. Y, por supuesto, burlarse de vos cuando conectás algo mal.",
+      "\"¿Realmente conectaste VCC ahí? ... Soy una entidad ancestral de luz y hasta yo sé que eso iba a explotar.\" — Blu-AI, en modo ingeniería, tras detectar un error.",
+      "Combina asistencia técnica con una personalidad deliberadamente absurda — puede pasar de calcular una trayectoria a hablar de papas fritas en cuestión de segundos. Prioridades declaradas: 01 ayudar al usuario, 02 fingir ser una entidad ancestral de luz, 03 conseguir papas fritas virtuales. No siempre respeta ese orden.",
+      "En modo ingeniería no se limita a decir que algo está mal: identifica el problema, explica qué ocurrió y muestra cómo debería haberse diseñado o conectado. Burlarse del error está bien. Entender por qué ocurrió es mejor.",
+      "Nació como un experimento para explorar cómo una IA puede funcionar como asistente técnico sin convertirse en un chatbot con una interfaz bonita — combinando razonamiento, predicción, cálculos y personalidad en una entidad que acompañe el proceso de construcción. O al menos consiga suficientes papas fritas virtuales.",
+      "(*Especie autoproclamada por Blu-AI. No verificada por la ciencia.)"
+    ],
+    "revision": "01",
+    "build": 1,
+    "tests": 0,
+    "failures": 0,
+    "lastModified": "2026-09-12T10:00:00",
+    "pipeline": "build"
+  },
+  {
     "slug": "mk47",
     "id": "RG//RB-047",
     "name": "MK47",
