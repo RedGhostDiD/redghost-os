@@ -1,5 +1,63 @@
 [
   {
+    "slug": "bluetooth-guitar-mod",
+    "id": "RG//HW-022",
+    "name": "BLUETOOTH GUITAR MOD",
+    "type": "HARDWARE",
+    "status": "FAILED",
+    "category": "AUDIO",
+    "systems": [
+      "EMBEDDED",
+      "AUDIO",
+      "BLUETOOTH"
+    ],
+    "specs": [
+      [
+        "SIGNAL",
+        "RECEIVED"
+      ],
+      [
+        "BLUETOOTH",
+        "WORKING"
+      ],
+      [
+        "AUDIO",
+        "NOISY"
+      ],
+      [
+        "LATENCY",
+        "TOO HIGH"
+      ],
+      [
+        "INTERFERENCE",
+        "PRESENT"
+      ]
+    ],
+    "summary": "Modificación experimental para transmitir el audio de una guitarra por Bluetooth a un teléfono — descartado por interferencia, ruido y una latencia demasiado alta para tocar en tiempo real.",
+    "description": [
+      "Una modificación experimental para convertir una guitarra convencional en un instrumento capaz de transmitir su señal de audio inalámbricamente hacia un teléfono mediante Bluetooth. La idea era eliminar el cable entre la guitarra y el teléfono con una solución compacta integrada directamente en el instrumento.",
+      "En teoría, era simple. En la práctica, el audio decidió recordarme que la electrónica tiene un sentido del humor bastante cuestionable.",
+      "El objetivo: GUITAR → AUDIO SIGNAL → WIRELESS TRANSMISSION → BLUETOOTH → PHONE. Conseguir una conexión inalámbrica funcional manteniendo una señal suficientemente limpia y con un retraso lo bastante bajo como para tocar el instrumento en tiempo real.",
+      "Durante las pruebas aparecieron tres problemas que terminaron haciendo inviable el proyecto: interferencia (la transmisión inalámbrica afectaba la señal de audio), latencia (el retraso entre tocar la guitarra y recibir el audio en el teléfono era demasiado perceptible) y ruido (la señal llegaba con ruido adicional, reduciendo la calidad).",
+      "El problema no era simplemente conseguir que el teléfono recibiera sonido. Era conseguir que recibiera el sonido correcto, limpio y suficientemente rápido.",
+      "El proyecto fue descartado porque la interferencia, el retraso y el ruido, juntos, hacían que la solución no cumpliera con el objetivo original.",
+      "Conseguir que una señal llegue de un punto a otro no significa que el sistema funcione correctamente. En audio en tiempo real, latencia, ruido e interferencias forman parte del diseño desde el principio — no son detalles que se puedan ignorar y arreglar al final.",
+      "El proyecto no terminó funcionando como esperaba. Pero dejó algo más útil que una guitarra inalámbrica: una razón concreta para no volver a diseñar el sistema de la misma manera."
+    ],
+    "revision": "01",
+    "build": 1,
+    "tests": 0,
+    "failures": 3,
+    "lastModified": "2025-07-18T14:00:00",
+    "pipeline": "test",
+    "postmortem": {
+      "problem": "La transmisión inalámbrica del audio era técnicamente posible, pero inutilizable para tocar guitarra en tiempo real.",
+      "cause": "Interferencia + latencia + ruido, los tres presentes a la vez.",
+      "fix": "—",
+      "result": "Proyecto descartado. Una conexión que funciona no es necesariamente una conexión utilizable."
+    }
+  },
+  {
     "slug": "cyberpunk-svg-system",
     "id": "RG//DS-006",
     "name": "CYBERPUNK SVG SYSTEM",
