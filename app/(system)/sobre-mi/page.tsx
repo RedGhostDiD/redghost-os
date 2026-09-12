@@ -62,6 +62,9 @@ export default function SobreMiPage() {
         <p className="mt-3 text-[10px] tracking-[0.15em]" style={{ color: "var(--rg-text-faint)" }}>
           ROBOTICS // SOFTWARE // ELECTRONICS // DESIGN — 20+ PROJECTS // 0 PRESUPUESTO // DEMASIADAS IDEAS
         </p>
+        <p className="mt-2 text-xs tracking-[0.15em] italic" style={{ color: "var(--rg-red-soft)" }}>
+          Creando cosas que probablemente no debía.
+        </p>
       </Panel>
 
       <Panel id="MOD_081" title="¿Quién es RedGhost?" delayMs={80}>
