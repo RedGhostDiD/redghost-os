@@ -44,8 +44,8 @@ function flickerBackground(finalIsStore: boolean, minDelay: number, maxDelay: nu
  * layers rendered outside the (system) layout tree (BinaryRain, the
  * atmosphere glow, the grid). Whenever that boundary is crossed it also
  * scrambles all visible page text for a moment and flickers the
- * background 2-4 times between the old and new void color. Entering is
- * deliberately slower (a beat to "read" the transition); leaving is quick.
+ * background 3-4 times between the old and new void color. Same timing
+ * both ways — entering and leaving feel identical.
  */
 export default function StoreThemeEffect() {
   const pathname = usePathname();
@@ -60,16 +60,8 @@ export default function StoreThemeEffect() {
 
     if (prev === null || prev === isStore) return;
 
-    if (isStore) {
-      // Entering — slower, more deliberate.
-      flickerBackground(true, 70, 190, 3, 4);
-      const cancel = scramblePageText(document.body, 950, 120);
-      return cancel;
-    }
-
-    // Leaving — quick snap back to normal.
-    flickerBackground(false, 25, 60, 2, 2);
-    const cancel = scramblePageText(document.body, 320, 55);
+    flickerBackground(isStore, 70, 190, 3, 4);
+    const cancel = scramblePageText(document.body, 950, 120);
     return cancel;
   }, [pathname]);
 
