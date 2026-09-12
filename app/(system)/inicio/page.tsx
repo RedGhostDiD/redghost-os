@@ -196,13 +196,13 @@ export default function InicioPage() {
         </Panel>
 
         <Panel id="MOD_003" title="Network" status={{ label: "CONNECTED", tone: "green" }} delayMs={420}>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
             {mainAvatar && (
               <span
-                className="relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 overflow-hidden rounded-full border"
+                className="relative shrink-0 w-28 h-28 sm:w-40 sm:h-40 overflow-hidden rounded-full border"
                 style={{ borderColor: "var(--rg-red-line)" }}
               >
-                <Image src={mainAvatar} alt="RedGhost" fill sizes="80px" className="object-cover" />
+                <Image src={mainAvatar} alt="RedGhost" fill sizes="160px" className="object-cover" />
               </span>
             )}
             <div className="flex-1 min-w-0 flex flex-col divide-y" style={{ borderColor: "var(--rg-red-line-soft)" }}>
