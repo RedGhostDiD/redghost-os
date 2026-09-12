@@ -167,6 +167,23 @@ export default function SobreMiPage() {
               que funcionó.
             </p>
             <p>Y si me dicen que no hay tiempo... pues hago lo que pueda hasta que se acabe completamente.</p>
+            <p
+              className="text-[10px] tracking-[0.15em] pl-3 border-l mt-3"
+              style={{ color: "var(--rg-red-soft)", borderColor: "var(--rg-red-line)" }}
+            >
+              EL FRACASO NO EXISTE.
+              <br />
+              <br />
+              Conectaste mal el capacitor.
+              <br />
+              Explotó.
+              <br />
+              <br />
+              Felicidades.
+              <br />
+              <br />
+              Ya sabes cómo NO hacerlo.
+            </p>
           </div>
           <div>
             <p className="text-xs tracking-[0.1em] mb-1.5" style={{ color: "var(--rg-red)" }}>
