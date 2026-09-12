@@ -1,5 +1,60 @@
 [
   {
+    "slug": "cyberpunk-svg-system",
+    "id": "RG//DS-006",
+    "name": "CYBERPUNK SVG SYSTEM",
+    "type": "DESIGN",
+    "status": "ACTIVE",
+    "category": "SVG SYSTEM",
+    "stack": [
+      "SVG",
+      "UI ASSETS"
+    ],
+    "specs": [
+      [
+        "FORMAT",
+        "SVG"
+      ],
+      [
+        "TYPE",
+        "VECTOR"
+      ],
+      [
+        "SCALABLE",
+        "YES"
+      ],
+      [
+        "RASTER",
+        "NO"
+      ],
+      [
+        "MODULAR",
+        "YES"
+      ],
+      [
+        "EDITABLE",
+        "YES"
+      ]
+    ],
+    "summary": "Biblioteca de iconos, símbolos y formas vectoriales con estética cyberpunk — un lenguaje visual reutilizable para interfaces, branding y proyectos de robótica.",
+    "description": [
+      "Un conjunto de iconos, símbolos y formas vectoriales con estética cyberpunk, diseñados para usarse en interfaces, proyectos digitales, branding y sistemas visuales. La idea es crear una biblioteca de elementos que puedan combinarse entre sí para construir interfaces con identidad propia, sin depender de imágenes rasterizadas o recursos externos.",
+      "Cada elemento está desarrollado como SVG, permitiendo modificar tamaño, proporciones, colores y componentes sin perder calidad.",
+      "El sistema utiliza una estética basada en geometría angular, líneas técnicas, formas modulares, símbolos industriales, interfaces futuristas, elementos inspirados en electrónica y maquinaria, detalles tipo HUD, composiciones asimétricas, y espacios negativos y formas fragmentadas.",
+      "No busca representar una tecnología ficticia específica. Busca crear la sensación de que pertenece a un sistema tecnológico que ya existe.",
+      "Pensado para usarse en UI/UX, interfaces web, branding, posters, elementos HUD, proyectos de robótica y REDGHOST.OS. Los recursos pueden usarse individualmente o combinarse para construir componentes visuales más complejos.",
+      "Funciona como una pequeña biblioteca visual reutilizable, pensada para crecer conforme aparecen nuevos proyectos y necesidades de diseño.",
+      "No quiero hacer solamente iconos que parezcan cyberpunk. Quiero construir un lenguaje visual reutilizable — que un símbolo pueda aparecer en una interfaz, en un robot, en una PCB, en un documento o en una pieza de branding y siga sintiéndose parte del mismo sistema.",
+      "Diseñar una pieza. Reutilizarla. Combinarla. Convertirla en un sistema."
+    ],
+    "revision": "01",
+    "build": 1,
+    "tests": 0,
+    "failures": 0,
+    "lastModified": "2026-09-12T11:00:00",
+    "pipeline": "iterate"
+  },
+  {
     "slug": "blu-ai",
     "id": "RG//SW-009",
     "name": "BLU-AI",
