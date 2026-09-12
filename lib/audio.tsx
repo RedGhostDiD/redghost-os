@@ -244,6 +244,27 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     playAmbientFrom(ctx, ambientOffsetRef.current);
   }, [playAmbientFrom]);
 
+  // Pause the ambience while the tab is hidden (switched away from,
+  // minimized, or the browser navigates elsewhere) and resume it when
+  // it's visible again — but only if the user hadn't already paused it
+  // themselves before that, so this never fights the manual controls.
+  const pausedByVisibilityRef = useRef(false);
+  useEffect(() => {
+    function onVisibility() {
+      if (document.hidden) {
+        if (ambientSourceRef.current) {
+          pausedByVisibilityRef.current = true;
+          ambientPause();
+        }
+      } else if (pausedByVisibilityRef.current) {
+        pausedByVisibilityRef.current = false;
+        ambientResume();
+      }
+    }
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, [ambientPause, ambientResume]);
+
   const ambientSeek = useCallback(
     (deltaSeconds: number) => {
       const ctx = ctxRef.current;
