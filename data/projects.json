@@ -48,7 +48,7 @@
     "build": 1,
     "tests": 0,
     "failures": 3,
-    "lastModified": "2026-09-12T10:50:23.668Z",
+    "lastModified": "2026-09-12T10:51:20.693Z",
     "pipeline": "test",
     "postmortem": {
       "problem": "La transmisión inalámbrica del audio era técnicamente posible, pero inutilizable para tocar guitarra en tiempo real.",
@@ -56,7 +56,7 @@
       "fix": "—",
       "result": "Proyecto descartado. Una conexión que funciona no es necesariamente una conexión utilizable."
     },
-    "hidden": true
+    "hidden": false
   },
   {
     "slug": "cyberpunk-svg-system",
