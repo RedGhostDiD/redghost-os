@@ -1,5 +1,5 @@
 import Panel from "@/components/Panel";
-import WallPostCard from "@/components/WallPostCard";
+import WallFeedItem from "@/components/WallFeedItem";
 import { WALL_POSTS } from "@/lib/wall";
 
 export const metadata = { title: "RG//WALL // REDGHOST_OS" };
@@ -16,8 +16,8 @@ export default function MuroPage() {
 
       {WALL_POSTS.length > 0 ? (
         <div className="flex flex-col gap-3">
-          {WALL_POSTS.map((post) => (
-            <WallPostCard key={post.slug} post={post} />
+          {WALL_POSTS.map((post, i) => (
+            <WallFeedItem key={post.slug} post={post} index={i} />
           ))}
         </div>
       ) : (

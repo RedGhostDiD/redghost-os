@@ -174,6 +174,20 @@
   filter: grayscale(1);
 }
 
+/* RG//WALL feed item: fade + rise in once it scrolls into range. Content
+   itself is only mounted near the viewport (see WallFeedItem) — this
+   class just animates the reveal once it is. */
+.rg-wall-item {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 400ms ease-out, transform 400ms ease-out;
+}
+
+.rg-wall-item-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 * {
   box-sizing: border-box;
 }
