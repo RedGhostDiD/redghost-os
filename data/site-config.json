@@ -15,11 +15,13 @@
     },
     {
       "label": "YOUTUBE",
-      "href": "#"
+      "href": "https://www.youtube.com/@RedGhost_DiD",
+      "handle": "@RedGhost_DiD"
     },
     {
       "label": "TIKTOK",
-      "href": "#"
+      "href": "https://www.tiktok.com/@redghost_did",
+      "handle": "@redghost_did"
     }
   ],
   "store": {
