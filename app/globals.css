@@ -146,6 +146,64 @@
   right: 12px;
 }
 
+/* one-shot full-screen glitch burst, fired when crossing the /store
+   boundary (entering or leaving). Two layers: a color-difference flicker
+   that briefly inverts the real page colors (no need to fake content),
+   plus a scanline tear texture on top. Both are fixed overlays — never
+   transform <body> itself, since several decor layers are position:fixed
+   and would desync from the viewport if their containing block moved. */
+.rg-page-glitch-flicker {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  animation: rg-page-glitch-flicker 550ms steps(1, end) forwards;
+}
+
+@keyframes rg-page-glitch-flicker {
+  0%, 4% { background: transparent; }
+  5% { background: #ff163d; }
+  9% { background: transparent; }
+  10% { background: #00ff88; }
+  15% { background: transparent; }
+  28% { background: #ff6a00; }
+  33% { background: transparent; }
+  46% { background: #b026ff; }
+  52% { background: transparent; }
+  62% { background: #ff163d; }
+  67% { background: transparent; }
+  80% { background: #ff6a00; }
+  86% { background: transparent; }
+  100% { background: transparent; }
+}
+
+.rg-page-glitch-scan {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: 0.5;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.5) 0px,
+    rgba(255, 255, 255, 0.5) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  animation: rg-page-glitch-scan 550ms steps(6, end) forwards;
+}
+
+@keyframes rg-page-glitch-scan {
+  0% { transform: translateY(0) scaleY(1); opacity: 0.5; }
+  20% { transform: translateY(-4%) scaleY(1.02); }
+  40% { transform: translateY(3%) scaleY(0.98); }
+  60% { transform: translateY(-2%) scaleY(1.01); }
+  80% { transform: translateY(1%) scaleY(1); opacity: 0.3; }
+  100% { transform: translateY(0) scaleY(1); opacity: 0; }
+}
+
 * {
   box-sizing: border-box;
 }
