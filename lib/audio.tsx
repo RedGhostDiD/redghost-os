@@ -26,6 +26,9 @@ const STORAGE_KEY = "redghost.audio.enabled";
 const AMBIENT_SRC = "/audio/ambient.mp3";
 const AMBIENT_VOLUME = 0.22;
 const AMBIENT_FADE_S = 1.5;
+// Boosts every synthesized UI sound effect (clicks, panel builds, boot
+// glitches, game sounds) without touching AMBIENT_VOLUME above.
+const EFFECT_GAIN_BOOST = 1.8;
 
 interface AudioContextValue {
   enabled: boolean;
@@ -81,7 +84,7 @@ function synth(
   }
 
   amp.gain.setValueAtTime(0.0001, start);
-  amp.gain.exponentialRampToValueAtTime(gain, start + 0.008);
+  amp.gain.exponentialRampToValueAtTime(gain * EFFECT_GAIN_BOOST, start + 0.008);
   amp.gain.exponentialRampToValueAtTime(0.0001, start + duration);
 
   osc.connect(amp);
