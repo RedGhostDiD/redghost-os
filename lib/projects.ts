@@ -38,6 +38,8 @@ export interface Project {
   stack?: string[];
   /** Public path to a thumbnail image, e.g. "/uploads/proyectos/mk47.jpg". */
   image?: string;
+  /** Kept in the data and editable in /admin, but excluded from every public listing/page. */
+  hidden?: boolean;
   /** Real engineering spec lines, e.g. ["MCU", "ESP32-S3"] — shown as a small spec sheet. */
   specs?: [string, string][];
   summary: string;
@@ -66,8 +68,13 @@ const CATEGORY_CODE: Record<ProjectType, string> = {
  * single source, filtered by `type` or `status`. Dashboard counters on
  * /inicio are also derived live from this array. Editable by hand or via
  * the /admin panel, which commits changes to that file through the GitHub API.
+ *
+ * Projects marked `hidden` are dropped here — every public page/helper
+ * below only ever sees the visible set. /admin reads the raw file
+ * directly (via lib/github-content.ts), so hidden projects still show up
+ * there for editing/unhiding.
  */
-export const PROJECTS: Project[] = projectsData as Project[];
+export const PROJECTS: Project[] = (projectsData as Project[]).filter((p) => !p.hidden);
 
 export function getProject(slug: string) {
   return PROJECTS.find((p) => p.slug === slug);

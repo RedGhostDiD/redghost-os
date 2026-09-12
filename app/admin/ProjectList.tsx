@@ -20,6 +20,7 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
   const router = useRouter();
   const [deleting, setDeleting] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [toggling, setToggling] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<ProjectType | "">("");
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | "">("");
@@ -38,6 +39,27 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
       )
       .sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime());
   }, [projects, query, typeFilter, statusFilter]);
+
+  async function handleToggleHidden(project: Project) {
+    setToggling(project.slug);
+    setDeleteError(null);
+    try {
+      const res = await fetch("/api/admin/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ project: { ...project, hidden: !project.hidden }, originalSlug: project.slug }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? "Error al cambiar visibilidad");
+      }
+      router.refresh();
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Error al cambiar visibilidad");
+    } finally {
+      setToggling(null);
+    }
+  }
 
   async function handleDelete(slug: string) {
     if (!confirm(`¿Eliminar el proyecto "${slug}"? Esto hace un commit al repo.`)) return;
@@ -109,7 +131,7 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
             <div
               key={p.slug}
               className="flex items-center justify-between gap-3 border px-3 py-2"
-              style={{ borderColor: "var(--rg-red-line)" }}
+              style={{ borderColor: "var(--rg-red-line)", opacity: p.hidden ? 0.55 : 1 }}
             >
               <div className="flex items-center gap-3 min-w-0">
                 {p.image && (
@@ -124,6 +146,11 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
                 <div className="min-w-0">
                   <p className="text-xs tracking-[0.1em] truncate" style={{ color: "var(--rg-text)" }}>
                     {p.name} <span style={{ color: "var(--rg-text-faint)" }}>— {p.id}</span>
+                    {p.hidden && (
+                      <span className="ml-2" style={{ color: "var(--rg-orange)" }}>
+                        [ OCULTO ]
+                      </span>
+                    )}
                   </p>
                   <p className="text-[10px] tracking-[0.1em]" style={{ color: "var(--rg-text-faint)" }}>
                     {p.type} · {p.status} · /{p.slug}
@@ -131,6 +158,14 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
                 </div>
               </div>
               <div className="flex gap-2 shrink-0">
+                <button
+                  onClick={() => handleToggleHidden(p)}
+                  disabled={toggling === p.slug}
+                  className="text-[10px] tracking-[0.1em] px-2.5 py-1.5 border disabled:opacity-50"
+                  style={{ borderColor: "var(--rg-red-line)", color: "var(--rg-text-dim)" }}
+                >
+                  {toggling === p.slug ? "..." : p.hidden ? "MOSTRAR" : "OCULTAR"}
+                </button>
                 <Link
                   href={`/admin/${p.slug}`}
                   className="text-[10px] tracking-[0.1em] px-2.5 py-1.5 border"

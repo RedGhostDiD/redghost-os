@@ -40,6 +40,7 @@
     "failures": 7,
     "lastModified": "2026-09-09T16:38:00",
     "pipeline": "build",
+    "hidden": true,
     "git": {
       "repo": "github.com/RedGhost-DiD/mk47",
       "commits": 62,
@@ -87,6 +88,7 @@
     "failures": 3,
     "lastModified": "2026-09-08T11:05:00",
     "pipeline": "test",
+    "hidden": true,
     "git": {
       "repo": "github.com/RedGhost-DiD/robot-soccer",
       "commits": 118,
@@ -269,6 +271,7 @@
     "failures": 5,
     "lastModified": "2026-09-05T13:00:00",
     "pipeline": "test",
+    "hidden": true,
     "postmortem": {
       "problem": "Interferencia mecánica entre el segundo y tercer eslabón.",
       "cause": "Geometría del eslabón mal calculada en la primera revisión.",
@@ -277,33 +280,215 @@
     }
   },
   {
-    "slug": "TestLol",
-    "id": "RG//MK-027",
-    "name": "Prueba",
-    "type": "SOFTWARE",
-    "status": "TESTING",
-    "summary": "PRUEBA DE TOKEN Y EDICION",
-    "description": [
-      "Prueba de token para validar que nadie mas edite la web"
-    ],
-    "revision": "01",
-    "build": 1,
-    "tests": 1,
-    "failures": 0,
-    "lastModified": "2026-09-11T22:37:48.539Z",
-    "pipeline": "test",
-    "category": "comprobacion de edicion",
+    "slug": "caprax",
+    "id": "RG//RB-001",
+    "name": "CAPRAX",
+    "type": "ROBOTICS",
+    "status": "ARCHIVED",
+    "category": "SOCCER",
     "systems": [
-      "SOFWARE"
-    ],
-    "stack": [
-      "GITHUB"
+      "MECHANICAL",
+      "ELECTRONICS",
+      "SOFTWARE",
+      "AI"
     ],
     "specs": [
       [
-        "GITHUB",
-        "TOKEN TEST"
+        "MCU",
+        "ESP32-S3"
+      ],
+      [
+        "VISION",
+        "OV2660"
+      ],
+      [
+        "DRIVE",
+        "4× POLOLU (200/1000 RPM)"
+      ],
+      [
+        "DRIBBLE",
+        "4× MOTORES AMARILLOS"
+      ],
+      [
+        "DIMENSIONS",
+        "20×20 CM"
       ]
-    ]
+    ],
+    "summary": "Robot de fútbol de robots con sistema de drible — tres generaciones (V1→V3) hasta un fallo de arquitectura que lo llevó al archivo.",
+    "description": [
+      "CAPRAX hace referencia a \"la cabra\" — apodo de un futbolista cuyo nombre ya no recuerdo. Tres generaciones sucesivas de un robot de fútbol con visión por cámara, sensores de color y sistema de drible.",
+      "V1 — Control: ESP32-S3 + Arduino UNO + shield L293D. Visión: cámara OV3660 y 4× sensores TCS con un MUX. Movimiento: 2 motores con ruedas de mini-sumo y 1 actuador. Drible: 4 motores amarillos para ruedas omnidireccionales.",
+      "V1 falló en casi todos los frentes: chasis de acrílico mal diseñado, ruedas difíciles de extraer y propensas a atascarse, cableado que se enredaba en las ruedas, batería mal ubicada, detección de color por promedio de área demasiado imprecisa, TCS con fallas ocasionales, y una comunicación ESP32→Arduino por pines específicos tan mal diseñada que interfería con el shield y terminó quemando el Arduino.",
+      "V2 — Rediseño completo de control (Arduino Nano + 2× L298N), visión (OV2660) y movimiento (4 motores Pololu: 2 a ~200 RPM para ruedas, 2 a ~1000 RPM para el drible, con ruedas CNC + silicón). Se reemplazó la comunicación por pines por un enlace TX→RX directo ESP32↔Nano, se trasladaron las ruedas al centro, se rediseñó el chasis, se montó la batería por fuera para facilitar el acceso, se agregó un rodillo para retener la pelota, y se abandonó la detección por promedio de color a favor de un sistema de IA.",
+      "V2 resolvió los problemas mecánicos y de comunicación de V1, pero la IA resultó demasiado pesada para correr en el ESP32-S3, y la gestión de cables seguía siendo deficiente.",
+      "V3 — Misma arquitectura de hardware que V2, con mejor gestión de cables. El cambio central: la IA dejó de procesarse en el ESP32-S3 y se movió a una laptop conectada por Wi-Fi.",
+      "Ese cambio expuso el fallo que terminó archivando el proyecto: la imagen tardaba demasiado en viajar del robot a la laptop y volver con la decisión, disparando la latencia y hundiendo el tiempo de reacción. En paralelo, uno de los puentes H empezó a fallar tras varios impactos — un problema que tardó en diagnosticarse porque inicialmente se sospechó del motor o la batería, y porque los motores eran difíciles de reemplazar."
+    ],
+    "revision": "03",
+    "build": 3,
+    "tests": 0,
+    "failures": 7,
+    "lastModified": "2025-11-20T18:00:00",
+    "pipeline": "iterate",
+    "postmortem": {
+      "problem": "Latencia de la IA por Wi-Fi + fallo progresivo de un puente H tras impactos repetidos.",
+      "cause": "Procesar visión en una laptop remota introdujo un viaje de ida y vuelta demasiado lento para el tiempo de reacción que necesita un robot de fútbol; el diagnóstico del puente H se retrasó porque los motores eran difíciles de reemplazar.",
+      "fix": "—",
+      "result": "Archivado tras tres generaciones. V1→V2 resolvió mecánica y comunicación; V2→V3 resolvió el peso de la IA pero introdujo un cuello de botella de latencia que nunca se resolvió."
+    }
+  },
+  {
+    "slug": "chaketrix",
+    "id": "RG//RB-002",
+    "name": "CHAKETRIX",
+    "type": "ROBOTICS",
+    "status": "ARCHIVED",
+    "category": "SUMO",
+    "systems": [
+      "MECHANICAL",
+      "ELECTRONICS",
+      "SOFTWARE"
+    ],
+    "specs": [
+      [
+        "MCU",
+        "ESP32-S3"
+      ],
+      [
+        "VISION",
+        "OV2660"
+      ],
+      [
+        "DRIVE",
+        "2× JGA25 ~170RPM"
+      ],
+      [
+        "SENSORS",
+        "ULTRASONIC + 2× TCRT"
+      ],
+      [
+        "DIMENSIONS",
+        "20×20 CM"
+      ]
+    ],
+    "summary": "Robot de sumo construido de forma casera — 2.º lugar en el Hackatón CECyTE Coahuila, categoría Sumo.",
+    "description": [
+      "El nombre viene del meme de Ben 10 — elegido porque era, literalmente, un robot construido de manera bastante casera: acrílico transparente, piezas metálicas y color rojo en su primera versión.",
+      "V1 — Arduino UNO + L293D, 2× sensores TCRT, 2 motores amarillos con sus ruedas, chasis de acrílico y metal, pala impresa en 3D, corte de voltaje por switch.",
+      "V1 tenía varios problemas: los impactos dañaban los motores amarillos por dentro, las ruedas tenían poca tracción, los TCRT analógicos fallaban de forma no documentada, y la pala quedaba ligeramente elevada — lo suficiente para que un rival pudiera levantarlo por el frente. Tampoco tenía un sistema de carga sencillo.",
+      "V2 — ESP32-S3 + OV2660, un puente H, sensor ultrasónico, 2× TCRT (analógico + digital), 2× motores JGA25 de ~170 RPM con transmisión metálica y ruedas CNC + silicón, pantalla y pulsador. La pala se reforzó con metal y se acercó más al suelo. Las baterías pasaron a cargarse externamente en una base.",
+      "Con esta versión, CHAKETRIX salió 2.º lugar en el Hackatón de los CECyTE en Coahuila, categoría Sumo.",
+      "La convocatoria estatal cambió de último momento la modalidad a seguidor de línea, y el robot no llegó a funcionar bien en esa categoría: la cámara no logró seguir líneas de distintos colores, en parte porque quedó demasiado elevada tras una modificación de última hora para acomodar el circuito.",
+      "Otros problemas de V2: era demasiado lento para girar, ruedas y laterales quedaban muy expuestos (un rival más rápido podía interceptarlo por el costado y sacarlo con facilidad), y el ultrasonido no detectaba bien a robots muy pequeños por su altura de montaje. La detección de torres por color funcionaba, pero exigía acercarse demasiado."
+    ],
+    "revision": "02",
+    "build": 2,
+    "tests": 0,
+    "failures": 6,
+    "lastModified": "2025-08-14T16:30:00",
+    "pipeline": "test",
+    "postmortem": {
+      "problem": "Giro lento y laterales expuestos permitían que un rival más rápido lo saque del ring por el costado.",
+      "cause": "La prioridad de diseño se puso en la pala frontal y la detección de torres; la velocidad de giro y la protección lateral quedaron en segundo plano.",
+      "fix": "—",
+      "result": "2.º lugar en el Hackatón CECyTE Coahuila (Sumo) con V2. Archivado tras el cambio de última hora de la convocatoria estatal a seguidor de línea, modalidad para la que no estaba diseñado."
+    }
+  },
+  {
+    "slug": "kasiki-meganas",
+    "id": "RG//RB-003",
+    "name": "KASIKI MEGANAS",
+    "type": "ROBOTICS",
+    "status": "ARCHIVED",
+    "category": "MINI SUMO",
+    "systems": [
+      "MECHANICAL",
+      "ELECTRONICS"
+    ],
+    "specs": [
+      [
+        "MCU",
+        "ARDUINO NANO"
+      ],
+      [
+        "SENSORS",
+        "3× ULTRASONIC + 2× TCRT"
+      ],
+      [
+        "DRIVE",
+        "2× MOTORES AMARILLOS"
+      ],
+      [
+        "DIMENSIONS",
+        "10×10 CM"
+      ]
+    ],
+    "summary": "Mini-sumo de 10×10cm — el nombre es un juego de palabras (\"casi me ganas\") pensado como provocación antes del combate.",
+    "description": [
+      "El nombre es una deformación de \"casi me ganas\" — pensado como humor/provocación antes de un combate de mini-sumo.",
+      "V1 — Arduino Nano, 3× sensores ultrasónicos, 2× TCRT, 2 motores amarillos, regulador de voltaje, sensor de control de juez (start). Estructura principalmente de acrílico con algunas piezas metálicas.",
+      "Problemas: los sensores ultrasónicos eran difíciles de reemplazar, el cableado tenía mal acceso, el robot resultó demasiado alto para la categoría, y los TCRT necesitaron modificaciones para funcionar correctamente."
+    ],
+    "revision": "01",
+    "build": 1,
+    "tests": 0,
+    "failures": 4,
+    "lastModified": "2025-05-10T12:00:00",
+    "pipeline": "test",
+    "postmortem": {
+      "problem": "Altura excesiva para la categoría mini-sumo y sensores ultrasónicos de difícil mantenimiento.",
+      "cause": "Elección de sensores y estructura sin optimizar para el límite de altura y la accesibilidad que exige la categoría.",
+      "fix": "—",
+      "result": "Quedó en V1, archivado."
+    }
+  },
+  {
+    "slug": "bodriotsito",
+    "id": "RG//RB-004",
+    "name": "BODRIOTSITO",
+    "type": "ROBOTICS",
+    "status": "ARCHIVED",
+    "category": "MINI SUMO",
+    "systems": [
+      "MECHANICAL",
+      "ELECTRONICS"
+    ],
+    "specs": [
+      [
+        "MCU",
+        "ARDUINO NANO"
+      ],
+      [
+        "SENSORS",
+        "SHARP + 2× TCRT"
+      ],
+      [
+        "DRIVE",
+        "2× MOTORES POLOLU"
+      ],
+      [
+        "DIMENSIONS",
+        "10×10 CM"
+      ]
+    ],
+    "summary": "Mini-sumo armado con sobrantes de otros robots — de ahí el nombre. Dos versiones, ambas con fallas estructurales alrededor de la pala/soportes.",
+    "description": [
+      "El nombre viene de que fue construido principalmente con sobrantes de otros robots.",
+      "V1 — 2× motores Pololu con ruedas CNC + silicón, sensor de control de juez, Arduino Nano, sensor de distancia Sharp, 2× TCRT, regulador de voltaje. Estructura de acrílico con soportes metálicos, con una rigidez notable.",
+      "La falla de V1: la posición de dos soportes generaba un punto débil estructural. Bastaba un impacto para dañar el chasis y dejar el robot inoperable.",
+      "V2 — Los soportes se desplazaron a una posición con mayor rigidez, resolviendo esa falla. Pero surgió una nueva: la pala tenía restricciones muy específicas de tamaño (muy pequeña, sin curvatura, en una posición muy determinada) que hacían complicado diseñarla para que encajara bien en el robot."
+    ],
+    "revision": "02",
+    "build": 2,
+    "tests": 0,
+    "failures": 2,
+    "lastModified": "2025-06-02T15:00:00",
+    "pipeline": "test",
+    "postmortem": {
+      "problem": "Restricciones de tamaño/posición de la pala impedían un diseño que encajara bien tras resolver la falla estructural de V1.",
+      "cause": "El rediseño de soportes en V2 dejó muy poco margen geométrico disponible para la pala.",
+      "fix": "—",
+      "result": "Archivado en V2, sin llegar a resolver el diseño de la pala."
+    }
   }
 ]

@@ -82,6 +82,7 @@ export default function ProjectForm({ initial, existingProjects }: Props) {
   const [pmCause, setPmCause] = useState(initial?.postmortem?.cause ?? "");
   const [pmFix, setPmFix] = useState(initial?.postmortem?.fix ?? "");
   const [pmResult, setPmResult] = useState(initial?.postmortem?.result ?? "");
+  const [hidden, setHidden] = useState(initial?.hidden ?? false);
 
   const [existingImage, setExistingImage] = useState(initial?.image ?? "");
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
@@ -168,6 +169,7 @@ export default function ProjectForm({ initial, existingProjects }: Props) {
         failures: Number(failures) || 0,
         lastModified: initial?.lastModified ?? new Date().toISOString(),
         pipeline,
+        hidden,
       };
 
       if (category.trim()) project.category = category.trim();
@@ -355,6 +357,11 @@ export default function ProjectForm({ initial, existingProjects }: Props) {
         <label className={labelClass} style={labelStyle}>CATEGORÍA (opcional)</label>
         <input className={inputClass} style={inputStyle} value={category} onChange={(e) => setCategory(e.target.value)} />
       </div>
+
+      <label className="flex items-center gap-2 text-[10px] tracking-[0.15em] cursor-pointer" style={labelStyle}>
+        <input type="checkbox" checked={hidden} onChange={(e) => setHidden(e.target.checked)} />
+        OCULTAR DE LA PÁGINA PRINCIPAL (queda guardado, pero no aparece en el sitio público)
+      </label>
 
       <div className="grid sm:grid-cols-2 gap-3">
         <div>
