@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "slug": "001",
+    "id": "RG//WALL_001",
+    "type": "TEXT",
+    "mood": "TEST",
+    "status": "ONLINE",
+    "text": [
+      "Pinche web toda hermosa alvg."
+    ],
+    "createdAt": "2026-09-12T09:41:35.206Z",
+    "hidden": false,
+    "projectSlug": "redghost-os"
+  }
+]
