@@ -23,6 +23,9 @@ type SoundName =
   | "game-fail";
 
 const STORAGE_KEY = "redghost.audio.enabled";
+const AMBIENT_SRC = "/audio/ambient.mp3";
+const AMBIENT_VOLUME = 0.22;
+const AMBIENT_FADE_S = 1.5;
 
 interface AudioContextValue {
   enabled: boolean;
@@ -35,8 +38,10 @@ interface AudioContextValue {
 const Ctx = createContext<AudioContextValue | null>(null);
 
 /**
- * Every sound RedGhost.OS makes is synthesized at runtime (no audio
- * files shipped) so the UI never depends on binary assets being present.
+ * Every UI sound effect is synthesized at runtime (no audio files) so
+ * those never depend on a binary asset being present. The one exception
+ * is the looping background ambience (see startAmbient below), which is
+ * a real recorded track played through the same AudioContext.
  */
 function synth(
   ctx: AudioContext,
@@ -126,16 +131,58 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [enabled, setEnabled] = useState(true);
   const [unlocked, setUnlocked] = useState(false);
   const ctxRef = useRef<AudioContext | null>(null);
+  const ambientGainRef = useRef<GainNode | null>(null);
+  const ambientStartedRef = useRef(false);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
     if (stored !== null) setEnabled(stored === "1");
   }, []);
 
+  // unlock()/startAmbient() are stable callbacks that read the latest
+  // `enabled` via this ref instead of closing over the state directly.
+  const enabledRef = useRef(enabled);
+  useEffect(() => {
+    enabledRef.current = enabled;
+  }, [enabled]);
+
+  // Background ambience: one looping track, started once per session right
+  // after the AudioContext unlocks. Volume is driven entirely by the gain
+  // node below (tracks `enabled`) rather than stopping/restarting the
+  // source, so muting is instant and unmuting never re-fetches/re-decodes.
+  const startAmbient = useCallback((ctx: AudioContext) => {
+    if (ambientStartedRef.current) return;
+    ambientStartedRef.current = true;
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.connect(ctx.destination);
+    ambientGainRef.current = gain;
+
+    fetch(AMBIENT_SRC)
+      .then((res) => res.arrayBuffer())
+      .then((buf) => ctx.decodeAudioData(buf))
+      .then((audioBuffer) => {
+        const source = ctx.createBufferSource();
+        source.buffer = audioBuffer;
+        source.loop = true;
+        source.connect(gain);
+        source.start(0);
+        gain.gain.linearRampToValueAtTime(
+          enabledRef.current ? AMBIENT_VOLUME : 0,
+          ctx.currentTime + AMBIENT_FADE_S
+        );
+      })
+      .catch(() => {
+        // Ambience is a nice-to-have; UI sound effects still work without it.
+      });
+  }, []);
+
   const unlock = useCallback(() => {
     if (ctxRef.current) {
       if (ctxRef.current.state === "suspended") void ctxRef.current.resume();
       setUnlocked(true);
+      startAmbient(ctxRef.current);
       return;
     }
     const AC =
@@ -144,7 +191,20 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         .webkitAudioContext;
     ctxRef.current = new AC();
     setUnlocked(true);
-  }, []);
+    startAmbient(ctxRef.current);
+  }, [startAmbient]);
+
+  // Fade the ambient bed in/out whenever the mute toggle changes.
+  useEffect(() => {
+    const ctx = ctxRef.current;
+    const gain = ambientGainRef.current;
+    if (!ctx || !gain) return;
+    gain.gain.cancelScheduledValues(ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(
+      enabled ? AMBIENT_VOLUME : 0,
+      ctx.currentTime + 0.4
+    );
+  }, [enabled]);
 
   // Sounds only work once the browser sees a user gesture. The boot gate
   // calls unlock() explicitly, but anyone landing anywhere else on the
