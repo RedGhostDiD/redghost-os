@@ -151,7 +151,7 @@
    Small jitter + rapid color cycling; removed the instant the real text
    is restored, so the element's own color rules take back over. */
 .rg-scramble-jitter {
-  animation: rg-scramble-jitter 110ms steps(2, end) infinite, rg-scramble-color 240ms steps(1, end) infinite;
+  animation: rg-scramble-jitter 180ms steps(2, end) infinite, rg-scramble-color 480ms steps(1, end) infinite;
 }
 
 @keyframes rg-scramble-jitter {

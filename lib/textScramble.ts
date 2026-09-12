@@ -29,7 +29,11 @@ function pickTextNodes(root: Node): Text[] {
  *
  * Returns a cancel function that restores everything immediately.
  */
-export function scramblePageText(root: HTMLElement, durationMs = 650): () => void {
+export function scramblePageText(
+  root: HTMLElement,
+  durationMs = 650,
+  updateIntervalMs = 90
+): () => void {
   const nodes = pickTextNodes(root);
   const originals = nodes.map((node) => node.nodeValue ?? "");
   const parents = new Set<HTMLElement>();
@@ -41,6 +45,7 @@ export function scramblePageText(root: HTMLElement, durationMs = 650): () => voi
   const start = performance.now();
   let raf = 0;
   let done = false;
+  let lastUpdate = -Infinity;
 
   function restore() {
     if (done) return;
@@ -57,14 +62,19 @@ export function scramblePageText(root: HTMLElement, durationMs = 650): () => voi
       restore();
       return;
     }
-    nodes.forEach((node, i) => {
-      const original = originals[i];
-      let scrambled = "";
-      for (const ch of original) {
-        scrambled += ch === " " || ch === "\n" ? ch : SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
-      }
-      node.nodeValue = scrambled;
-    });
+    // Throttled so each random configuration lingers long enough to read
+    // as a deliberate glitch instead of a blur of noise.
+    if (now - lastUpdate >= updateIntervalMs) {
+      lastUpdate = now;
+      nodes.forEach((node, i) => {
+        const original = originals[i];
+        let scrambled = "";
+        for (const ch of original) {
+          scrambled += ch === " " || ch === "\n" ? ch : SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+        }
+        node.nodeValue = scrambled;
+      });
+    }
     raf = requestAnimationFrame(frame);
   }
 

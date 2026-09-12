@@ -8,7 +8,7 @@ import { scramblePageText } from "@/lib/textScramble";
 const VOID_DEFAULT = "#050509";
 const VOID_STORE = "#140700";
 
-function flickerBackground(finalIsStore: boolean) {
+function flickerBackground(finalIsStore: boolean, minDelay: number, maxDelay: number, minFlickers: number, maxFlickers: number) {
   const overlay = document.createElement("div");
   overlay.setAttribute("aria-hidden", "true");
   Object.assign(overlay.style, {
@@ -20,7 +20,7 @@ function flickerBackground(finalIsStore: boolean) {
   } as CSSStyleDeclaration);
   document.body.appendChild(overlay);
 
-  const flickers = 2 + Math.floor(Math.random() * 3); // 2..4
+  const flickers = minFlickers + Math.floor(Math.random() * (maxFlickers - minFlickers + 1));
   let shown = false;
 
   function step(i: number) {
@@ -31,7 +31,7 @@ function flickerBackground(finalIsStore: boolean) {
     shown = !shown;
     overlay.style.background = shown ? VOID_STORE : VOID_DEFAULT;
     overlay.style.opacity = shown === finalIsStore ? "0.55" : "0.35";
-    const delay = 50 + Math.random() * 110;
+    const delay = minDelay + Math.random() * (maxDelay - minDelay);
     setTimeout(() => step(i + 1), delay);
   }
 
@@ -42,10 +42,10 @@ function flickerBackground(finalIsStore: boolean) {
  * Toggles .rg-store-theme on <body> while browsing /store — done on body
  * (not a wrapping div) so the swap reaches everything, including decor
  * layers rendered outside the (system) layout tree (BinaryRain, the
- * atmosphere glow, the grid). Whenever that boundary is crossed (entering
- * or leaving), it also scrambles all visible page text for a moment and
- * flickers the background 2-4 times between the old and new void color
- * at random short intervals.
+ * atmosphere glow, the grid). Whenever that boundary is crossed it also
+ * scrambles all visible page text for a moment and flickers the
+ * background 2-4 times between the old and new void color. Entering is
+ * deliberately slower (a beat to "read" the transition); leaving is quick.
  */
 export default function StoreThemeEffect() {
   const pathname = usePathname();
@@ -60,9 +60,17 @@ export default function StoreThemeEffect() {
 
     if (prev === null || prev === isStore) return;
 
-    flickerBackground(isStore);
-    const cancelScramble = scramblePageText(document.body, 650);
-    return cancelScramble;
+    if (isStore) {
+      // Entering — slower, more deliberate.
+      flickerBackground(true, 70, 190, 3, 4);
+      const cancel = scramblePageText(document.body, 950, 120);
+      return cancel;
+    }
+
+    // Leaving — quick snap back to normal.
+    flickerBackground(false, 25, 60, 2, 2);
+    const cancel = scramblePageText(document.body, 320, 55);
+    return cancel;
   }, [pathname]);
 
   return null;
