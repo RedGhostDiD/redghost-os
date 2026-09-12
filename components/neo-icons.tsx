@@ -98,3 +98,30 @@ export function IconInstagram({ className }: IconProps) {
     </svg>
   );
 }
+
+export function IconYoutube({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <rect x="3" y="6" width="18" height="12" rx="3" />
+      <path d="M10.5 9.5l5 2.5-5 2.5z" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function IconTiktok({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" className={className}>
+      <path d="M14 3c.3 1.9 1.6 3.3 3.5 3.6V9c-1.3 0-2.5-.4-3.5-1.1v6.6a5 5 0 1 1-4.3-4.9v2.6a2.4 2.4 0 1 0 1.8 2.3V3h2.5z" />
+    </svg>
+  );
+}
+
+export function IconDiscord({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M8 5.5C6.5 6 5.5 6.8 5 8c-1 2.3-1.5 5-1.3 7.5.9.8 2 1.4 3.1 1.7l.6-1.2M16 5.5c1.5.5 2.5 1.3 3 2.5 1 2.3 1.5 5 1.3 7.5-.9.8-2 1.4-3.1 1.7l-.6-1.2" />
+      <ellipse cx="9" cy="13" rx="1.4" ry="1.7" fill="currentColor" stroke="none" />
+      <ellipse cx="15" cy="13" rx="1.4" ry="1.7" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
