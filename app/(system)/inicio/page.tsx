@@ -199,10 +199,16 @@ export default function InicioPage() {
           <div className="flex flex-col sm:flex-row items-center gap-5">
             {mainAvatar && (
               <span
-                className="relative shrink-0 w-40 h-40 sm:w-40 sm:h-40 overflow-hidden rounded-full border"
+                className="relative shrink-0 w-56 h-56 sm:w-40 sm:h-40 overflow-hidden rounded-full border"
                 style={{ borderColor: "var(--rg-red-line)" }}
               >
-                <Image src={mainAvatar} alt="RedGhost" fill sizes="160px" className="object-cover" />
+                <Image
+                  src={mainAvatar}
+                  alt="RedGhost"
+                  fill
+                  sizes="(max-width: 640px) 224px, 160px"
+                  className="object-cover"
+                />
               </span>
             )}
             <div className="w-full sm:flex-1 min-w-0 flex flex-col divide-y" style={{ borderColor: "var(--rg-red-line-soft)" }}>
