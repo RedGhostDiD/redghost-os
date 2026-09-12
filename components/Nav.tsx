@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAudio } from "@/lib/audio";
 import AudioToggle from "./AudioToggle";
+import AmbientPlayerControl from "./AmbientPlayerControl";
 
 const MODULES = [
   { label: "HOME", href: "/inicio" },
@@ -69,6 +70,7 @@ export default function Nav() {
               DiD: ACTIVE
             </span>
             <AudioToggle />
+            <AmbientPlayerControl />
           </div>
         </div>
 

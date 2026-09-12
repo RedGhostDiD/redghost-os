@@ -33,6 +33,12 @@ interface AudioContextValue {
   toggle: () => void;
   unlock: () => void;
   play: (name: SoundName) => void;
+  ambientPlaying: boolean;
+  ambientPosition: number;
+  ambientDuration: number;
+  ambientPause: () => void;
+  ambientResume: () => void;
+  ambientSeek: (deltaSeconds: number) => void;
 }
 
 const Ctx = createContext<AudioContextValue | null>(null);
@@ -133,6 +139,18 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const ctxRef = useRef<AudioContext | null>(null);
   const ambientGainRef = useRef<GainNode | null>(null);
   const ambientStartedRef = useRef(false);
+  const ambientBufferRef = useRef<AudioBuffer | null>(null);
+  const ambientSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  // Position within the buffer where the *current* source began playing,
+  // and the ctx.currentTime at which it began — together these let us
+  // compute live playback position without any native "timeupdate" event
+  // (AudioBufferSourceNode has none). Modulo the buffer duration handles
+  // the native loop transparently, since it wraps the same way audibly.
+  const ambientOffsetRef = useRef(0);
+  const ambientStartedAtRef = useRef(0);
+  const [ambientPlaying, setAmbientPlaying] = useState(false);
+  const [ambientPosition, setAmbientPosition] = useState(0);
+  const [ambientDuration, setAmbientDuration] = useState(0);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
@@ -146,37 +164,115 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     enabledRef.current = enabled;
   }, [enabled]);
 
+  // Starts (or restarts, from `fromOffset`) the actual looping source node.
+  // Used both for the very first play and for every resume/seek after.
+  const playAmbientFrom = useCallback((ctx: AudioContext, fromOffset: number) => {
+    const buffer = ambientBufferRef.current;
+    const gain = ambientGainRef.current;
+    if (!buffer || !gain) return;
+
+    const clamped = ((fromOffset % buffer.duration) + buffer.duration) % buffer.duration;
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+    source.connect(gain);
+    source.start(0, clamped);
+
+    ambientSourceRef.current = source;
+    ambientOffsetRef.current = clamped;
+    ambientStartedAtRef.current = ctx.currentTime;
+    setAmbientPlaying(true);
+  }, []);
+
   // Background ambience: one looping track, started once per session right
   // after the AudioContext unlocks. Volume is driven entirely by the gain
   // node below (tracks `enabled`) rather than stopping/restarting the
   // source, so muting is instant and unmuting never re-fetches/re-decodes.
-  const startAmbient = useCallback((ctx: AudioContext) => {
-    if (ambientStartedRef.current) return;
-    ambientStartedRef.current = true;
+  const startAmbient = useCallback(
+    (ctx: AudioContext) => {
+      if (ambientStartedRef.current) return;
+      ambientStartedRef.current = true;
 
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0, ctx.currentTime);
-    gain.connect(ctx.destination);
-    ambientGainRef.current = gain;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.connect(ctx.destination);
+      ambientGainRef.current = gain;
 
-    fetch(AMBIENT_SRC)
-      .then((res) => res.arrayBuffer())
-      .then((buf) => ctx.decodeAudioData(buf))
-      .then((audioBuffer) => {
-        const source = ctx.createBufferSource();
-        source.buffer = audioBuffer;
-        source.loop = true;
-        source.connect(gain);
-        source.start(0);
-        gain.gain.linearRampToValueAtTime(
-          enabledRef.current ? AMBIENT_VOLUME : 0,
-          ctx.currentTime + AMBIENT_FADE_S
-        );
-      })
-      .catch(() => {
-        // Ambience is a nice-to-have; UI sound effects still work without it.
-      });
+      fetch(AMBIENT_SRC)
+        .then((res) => res.arrayBuffer())
+        .then((buf) => ctx.decodeAudioData(buf))
+        .then((audioBuffer) => {
+          ambientBufferRef.current = audioBuffer;
+          setAmbientDuration(audioBuffer.duration);
+          playAmbientFrom(ctx, 0);
+          gain.gain.linearRampToValueAtTime(
+            enabledRef.current ? AMBIENT_VOLUME : 0,
+            ctx.currentTime + AMBIENT_FADE_S
+          );
+        })
+        .catch(() => {
+          // Ambience is a nice-to-have; UI sound effects still work without it.
+        });
+    },
+    [playAmbientFrom]
+  );
+
+  /** Current playback position, accounting for whether it's actually playing. */
+  const readAmbientPosition = useCallback((ctx: AudioContext) => {
+    const buffer = ambientBufferRef.current;
+    if (!buffer) return 0;
+    if (!ambientSourceRef.current) return ambientOffsetRef.current;
+    const elapsed = ctx.currentTime - ambientStartedAtRef.current;
+    return ((ambientOffsetRef.current + elapsed) % buffer.duration + buffer.duration) % buffer.duration;
   }, []);
+
+  const ambientPause = useCallback(() => {
+    const ctx = ctxRef.current;
+    const source = ambientSourceRef.current;
+    if (!ctx || !source) return;
+    const pausedAt = readAmbientPosition(ctx);
+    source.stop();
+    ambientSourceRef.current = null;
+    ambientOffsetRef.current = pausedAt;
+    setAmbientPosition(pausedAt);
+    setAmbientPlaying(false);
+  }, [readAmbientPosition]);
+
+  const ambientResume = useCallback(() => {
+    const ctx = ctxRef.current;
+    if (!ctx || ambientSourceRef.current || !ambientBufferRef.current) return;
+    playAmbientFrom(ctx, ambientOffsetRef.current);
+  }, [playAmbientFrom]);
+
+  const ambientSeek = useCallback(
+    (deltaSeconds: number) => {
+      const ctx = ctxRef.current;
+      if (!ctx || !ambientBufferRef.current) return;
+      const next = readAmbientPosition(ctx) + deltaSeconds;
+      if (ambientSourceRef.current) {
+        ambientSourceRef.current.stop();
+        ambientSourceRef.current = null;
+        playAmbientFrom(ctx, next);
+      } else {
+        const buffer = ambientBufferRef.current;
+        const clamped = ((next % buffer.duration) + buffer.duration) % buffer.duration;
+        ambientOffsetRef.current = clamped;
+        setAmbientPosition(clamped);
+      }
+    },
+    [playAmbientFrom, readAmbientPosition]
+  );
+
+  // Live position readout, only while actually playing.
+  useEffect(() => {
+    if (!ambientPlaying) return;
+    const id = setInterval(() => {
+      const ctx = ctxRef.current;
+      if (!ctx) return;
+      setAmbientPosition(readAmbientPosition(ctx));
+    }, 250);
+    return () => clearInterval(id);
+  }, [ambientPlaying, readAmbientPosition]);
 
   const unlock = useCallback(() => {
     if (ctxRef.current) {
@@ -242,8 +338,32 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ enabled, unlocked, toggle, unlock, play }),
-    [enabled, unlocked, toggle, unlock, play]
+    () => ({
+      enabled,
+      unlocked,
+      toggle,
+      unlock,
+      play,
+      ambientPlaying,
+      ambientPosition,
+      ambientDuration,
+      ambientPause,
+      ambientResume,
+      ambientSeek,
+    }),
+    [
+      enabled,
+      unlocked,
+      toggle,
+      unlock,
+      play,
+      ambientPlaying,
+      ambientPosition,
+      ambientDuration,
+      ambientPause,
+      ambientResume,
+      ambientSeek,
+    ]
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
