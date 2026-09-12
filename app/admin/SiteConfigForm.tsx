@@ -13,6 +13,8 @@ export default function SiteConfigForm({ initial }: { initial: SiteConfig }) {
   const router = useRouter();
   const [email, setEmail] = useState(initial.email);
   const [socials, setSocials] = useState<SocialRow[]>(initial.socials.map((s) => ({ ...s })));
+  const [storeUrl, setStoreUrl] = useState(initial.store.url);
+  const [storeEnabled, setStoreEnabled] = useState(initial.store.enabled);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -92,7 +94,12 @@ export default function SiteConfigForm({ initial }: { initial: SiteConfig }) {
         });
       }
 
-      const config: SiteConfig = { ...initial, email: email.trim(), socials: resolvedSocials };
+      const config: SiteConfig = {
+        ...initial,
+        email: email.trim(),
+        socials: resolvedSocials,
+        store: { url: storeUrl.trim(), enabled: storeEnabled },
+      };
 
       const res = await fetch("/api/admin/site-config", {
         method: "POST",
@@ -132,6 +139,22 @@ export default function SiteConfigForm({ initial }: { initial: SiteConfig }) {
         <label className={labelClass} style={labelStyle}>EMAIL DE CONTACTO</label>
         <input type="email" className={inputClass} style={inputStyle} value={email} onChange={(e) => setEmail(e.target.value)} required />
       </div>
+
+      <fieldset className="border p-3 flex flex-col gap-3" style={{ borderColor: "var(--rg-red-line)" }}>
+        <legend className="text-[10px] tracking-[0.15em] px-1" style={labelStyle}>BLACK MARKET (STORE)</legend>
+        <div>
+          <label className={labelClass} style={labelStyle}>URL DE LA TIENDA</label>
+          <input className={inputClass} style={inputStyle} value={storeUrl} onChange={(e) => setStoreUrl(e.target.value)} placeholder="https://redghost.store" />
+        </div>
+        <label className="flex items-center gap-2 text-[10px] tracking-[0.15em] cursor-pointer" style={labelStyle}>
+          <input
+            type="checkbox"
+            checked={storeEnabled}
+            onChange={(e) => setStoreEnabled(e.target.checked)}
+          />
+          TIENDA HABILITADA (si se desmarca, el botón queda bloqueado con &quot;OFFLINE&quot;)
+        </label>
+      </fieldset>
 
       <div className="flex flex-col gap-3">
         <label className={labelClass} style={labelStyle}>REDES SOCIALES</label>

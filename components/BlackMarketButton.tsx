@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 
-const STORE_URL = "https://redghost.store";
-
 type Phase = "idle" | "authenticating" | "verified" | "opening";
 
 const PHASE_LINES: Record<Exclude<Phase, "idle">, string> = {
@@ -18,18 +16,33 @@ const PHASE_COLOR: Record<Exclude<Phase, "idle">, string> = {
   opening: "var(--rg-red)",
 };
 
-export default function BlackMarketButton() {
+export default function BlackMarketButton({
+  url,
+  enabled,
+}: {
+  url: string;
+  enabled: boolean;
+}) {
   const [phase, setPhase] = useState<Phase>("idle");
 
   function handleClick() {
-    if (phase !== "idle") return;
+    if (!enabled || phase !== "idle") return;
     setPhase("authenticating");
     setTimeout(() => setPhase("verified"), 600);
     setTimeout(() => setPhase("opening"), 1200);
     setTimeout(() => {
-      window.open(STORE_URL, "_blank", "noopener,noreferrer");
+      window.open(url, "_blank", "noopener,noreferrer");
       setPhase("idle");
     }, 1800);
+  }
+
+  if (!enabled) {
+    return (
+      <button type="button" disabled className="rg-market-btn rg-store-offline">
+        {"> ACCESS BLACK MARKET"}
+        <span className="block text-[10px] tracking-[0.3em] mt-1">OFFLINE</span>
+      </button>
+    );
   }
 
   return (

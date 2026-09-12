@@ -16,6 +16,10 @@
     { "label": "YOUTUBE", "href": "#" },
     { "label": "TIKTOK", "href": "#" }
   ],
+  "store": {
+    "url": "https://redghost.store",
+    "enabled": true
+  },
   "buildVersion": "2026.09.10",
   "didBrandVersion": "v2.7.14",
   "lastSystemUpdate": "2026.09.10 // 17:42"

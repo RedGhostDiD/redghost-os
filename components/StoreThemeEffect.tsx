@@ -1,23 +1,68 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { scramblePageText } from "@/lib/textScramble";
+
+// Must match --rg-void in globals.css (default) and .rg-store-theme (store).
+const VOID_DEFAULT = "#050509";
+const VOID_STORE = "#140700";
+
+function flickerBackground(finalIsStore: boolean) {
+  const overlay = document.createElement("div");
+  overlay.setAttribute("aria-hidden", "true");
+  Object.assign(overlay.style, {
+    position: "fixed",
+    inset: "0",
+    zIndex: "9998",
+    pointerEvents: "none",
+    mixBlendMode: "normal",
+  } as CSSStyleDeclaration);
+  document.body.appendChild(overlay);
+
+  const flickers = 2 + Math.floor(Math.random() * 3); // 2..4
+  let shown = false;
+
+  function step(i: number) {
+    if (i >= flickers) {
+      overlay.remove();
+      return;
+    }
+    shown = !shown;
+    overlay.style.background = shown ? VOID_STORE : VOID_DEFAULT;
+    overlay.style.opacity = shown === finalIsStore ? "0.55" : "0.35";
+    const delay = 50 + Math.random() * 110;
+    setTimeout(() => step(i + 1), delay);
+  }
+
+  step(0);
+}
 
 /**
- * Toggles .rg-store-theme on <body> while browsing /store. Done on body
+ * Toggles .rg-store-theme on <body> while browsing /store — done on body
  * (not a wrapping div) so the swap reaches everything, including decor
- * layers rendered outside the (system) layout tree — BinaryRain, the
- * atmosphere glow, the grid — not just nav/panels/footer.
+ * layers rendered outside the (system) layout tree (BinaryRain, the
+ * atmosphere glow, the grid). Whenever that boundary is crossed (entering
+ * or leaving), it also scrambles all visible page text for a moment and
+ * flickers the background 2-4 times between the old and new void color
+ * at random short intervals.
  */
 export default function StoreThemeEffect() {
   const pathname = usePathname();
+  const prevIsStoreRef = useRef<boolean | null>(null);
 
   useEffect(() => {
     const isStore = pathname?.startsWith("/store") ?? false;
+    const prev = prevIsStoreRef.current;
+    prevIsStoreRef.current = isStore;
+
     document.body.classList.toggle("rg-store-theme", isStore);
-    return () => {
-      document.body.classList.remove("rg-store-theme");
-    };
+
+    if (prev === null || prev === isStore) return;
+
+    flickerBackground(isStore);
+    const cancelScramble = scramblePageText(document.body, 650);
+    return cancelScramble;
   }, [pathname]);
 
   return null;

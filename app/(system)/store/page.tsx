@@ -1,4 +1,5 @@
 import BlackMarketButton from "@/components/BlackMarketButton";
+import { SITE_CONFIG } from "@/lib/site-config";
 
 export const metadata = { title: "BLACK MARKET // REDGHOST_OS" };
 
@@ -39,7 +40,7 @@ export default function StorePage() {
       </p>
 
       <div className="mt-6">
-        <BlackMarketButton />
+        <BlackMarketButton url={SITE_CONFIG.store.url} enabled={SITE_CONFIG.store.enabled} />
       </div>
 
       <p

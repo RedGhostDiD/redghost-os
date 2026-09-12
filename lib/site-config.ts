@@ -7,9 +7,15 @@ export interface SocialLink {
   avatar?: string;
 }
 
+export interface StoreConfig {
+  url: string;
+  enabled: boolean;
+}
+
 export interface SiteConfig {
   email: string;
   socials: SocialLink[];
+  store: StoreConfig;
   buildVersion: string;
   didBrandVersion: string;
   lastSystemUpdate: string;

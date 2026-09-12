@@ -146,6 +146,34 @@
   right: 12px;
 }
 
+/* text-scramble transition: applied by lib/textScramble.ts to whatever
+   element holds a text node currently being scrambled to random glyphs.
+   Small jitter + rapid color cycling; removed the instant the real text
+   is restored, so the element's own color rules take back over. */
+.rg-scramble-jitter {
+  animation: rg-scramble-jitter 110ms steps(2, end) infinite, rg-scramble-color 240ms steps(1, end) infinite;
+}
+
+@keyframes rg-scramble-jitter {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(1px, -1px); }
+  100% { transform: translate(-1px, 1px); }
+}
+
+@keyframes rg-scramble-color {
+  0% { color: var(--rg-red); }
+  25% { color: var(--rg-orange); }
+  50% { color: var(--rg-green); }
+  75% { color: var(--rg-purple); }
+  100% { color: var(--rg-red); }
+}
+
+.rg-store-offline {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
 * {
   box-sizing: border-box;
 }
