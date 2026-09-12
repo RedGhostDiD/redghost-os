@@ -3,22 +3,28 @@
   "socials": [
     {
       "label": "GITHUB",
-      "handle": "RedGhostDiD",
       "href": "https://github.com/RedGhostDiD",
+      "handle": "RedGhostDiD",
       "avatar": "/social/github.png"
     },
     {
       "label": "INSTAGRAM",
-      "handle": "@redghost.did",
       "href": "https://www.instagram.com/redghost.did/",
+      "handle": "@redghost.did",
       "avatar": "/social/instagram.jpg"
     },
-    { "label": "YOUTUBE", "href": "#" },
-    { "label": "TIKTOK", "href": "#" }
+    {
+      "label": "YOUTUBE",
+      "href": "#"
+    },
+    {
+      "label": "TIKTOK",
+      "href": "#"
+    }
   ],
   "store": {
     "url": "https://redghost.store",
-    "enabled": true
+    "enabled": false
   },
   "buildVersion": "2026.09.10",
   "didBrandVersion": "v2.7.14",
