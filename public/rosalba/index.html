@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <base href="/rosalba/">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0e0f1f">
+  <title>Un jardín para Rosalba 🌸</title>
+  <link rel="icon" href="assets/flor.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="sky" aria-hidden="true"></div>
+
+  <!-- Código decorativo: parte del paisaje, no hace falta leerlo -->
+  <div class="deco-layer" aria-hidden="true">
+    <pre class="deco deco--a"><code>const garden = new Garden();
+
+garden.add("🌸");
+garden.add("🌼");
+garden.add("🌷");
+
+garden.bloom();</code></pre>
+    <pre class="deco deco--b"><code>while (friend.isAwesome()) {
+  flowers.push(new Flower());
+}
+// TODO: regar las flores 💧</code></pre>
+  </div>
+
+  <canvas id="garden" aria-label="Un jardín de flores programado para Rosalba, una amiga"></canvas>
+
+  <!-- Consola -->
+  <div id="term" class="term" role="log" aria-live="polite">
+    <div class="term-bar"><i></i><i></i><i></i><span>garden.sh — para Rosalba</span></div>
+    <div id="termLines" class="term-body"></div>
+  </div>
+
+  <main id="stage">
+    <!-- const friend = "Rosalba"; → 🌸 Para Rosalba 🌸 -->
+    <section id="dedication" class="scene">
+      <div class="morph">
+        <p id="codeLine" class="codeline"></p>
+        <h1 id="title" class="title fade">🌸 Para Rosalba 🌸</h1>
+      </div>
+      <p id="subtitle" class="subtitle fade">Porque una amiga también merece flores <span class="tongue">:P</span></p>
+      <p id="bloomCode" class="codeline codeline--small"></p>
+    </section>
+
+    <!-- Mensaje final -->
+    <section id="finale" class="scene">
+      <div class="card">
+        <div class="term-bar"><i></i><i></i><i></i><span>friendship.exe</span></div>
+        <div class="card-body">
+          <p id="cardLog" class="card-log"></p>
+          <h2 id="cardTitle" class="finale-title fade">🌷 Para Rosalba</h2>
+          <p id="cardMsg" class="finale-msg fade">Gracias por ser una buena amiga.</p>
+          <p id="cardNote" class="finale-note fade">Hecho con código, porque aparentemente regalar flores normalmente era demasiado fácil <span class="tongue tongue--small">:P</span></p>
+        </div>
+      </div>
+      <p id="hint" class="hint fade">(toca las flores 🌸)</p>
+    </section>
+  </main>
+
+  <div id="veil" aria-hidden="true"></div>
+
+  <div class="controls controls--left">
+    <div id="level" class="pill pill--mono" hidden>friendship_level: <b id="levelNum">100</b></div>
+  </div>
+  <div class="controls">
+    <button id="replay" class="pill" type="button" hidden>↻ otra vez</button>
+    <button id="soundBtn" class="pill" type="button" aria-pressed="false">
+      <span class="ico" aria-hidden="true">♪</span> <span class="lbl">sin sonido</span>
+    </button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
