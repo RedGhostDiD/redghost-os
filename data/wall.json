@@ -11,5 +11,18 @@
     "createdAt": "2026-09-12T09:41:35.206Z",
     "hidden": false,
     "projectSlug": "redghost-os"
+  },
+  {
+    "slug": "002",
+    "id": "RG//WALL_002",
+    "type": "TEXT",
+    "mood": "RANDOM",
+    "status": "ONLINE",
+    "text": [
+      "Tercera ley de Newton:",
+      "«Para avanzar necesitas dejar algo atrás, sacrificando algo de magnitud equivalente o mayor»"
+    ],
+    "createdAt": "2026-11-01T20:17:54.961Z",
+    "hidden": false
   }
 ]
