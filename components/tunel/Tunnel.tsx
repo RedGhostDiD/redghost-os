@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 /**
  * Black-and-white photo tunnel. Photos sit around a ring at different depths
@@ -37,7 +37,12 @@ const NEAR = 60;
 const FAR = 4200;
 // Phones draw photos up to a shorter distance, so ~16 are on screen instead of ~30.
 const FAR_PHONE = 2300;
-const PHONE_QUERY = "(max-width: 768px)";
+// Phones and tablets: "lite" rendering (one image per photo, no per-frame
+// filters, lighter grain) so the tunnel keeps a smooth frame rate.
+const PHONE_QUERY = "(max-width: 768px), (pointer: coarse)";
+// Images are mounted in blocks of this many slots, so React re-renders
+// rarely even when scrolling fast.
+const MOUNT_CHUNK = 4;
 const RING_X = 900; // ring the photos are arranged on
 const RING_Y = 560;
 const BASE_SPEED = 2.2; // depth units per 60 fps frame
@@ -134,13 +139,22 @@ function noiseTile(kind: "lum" | "chroma"): string {
  * blended back together. Aligned they make the original gray image; shifting
  * the red and blue copies (via --cax / --cay) gives colour fringes.
  */
-function CAImage({ src }: { src: string }) {
+function CAImage({ src, lite = false }: { src: string; lite?: boolean }) {
   // Hidden until loaded: the tinted backgrounds alone would screen-blend to a white box.
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   useEffect(() => {
     setLoaded(!!imgRef.current?.complete && imgRef.current.naturalWidth > 0);
   }, [src]);
+  if (lite) {
+    // One plain image: no colour channels, no blend modes. Much cheaper on phones.
+    return (
+      <span className={`ca ca-lite ${loaded ? "is-loaded" : ""}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img ref={imgRef} src={src} alt="" draggable={false} decoding="async" onLoad={() => setLoaded(true)} />
+      </span>
+    );
+  }
   return (
     <span className={`ca ${loaded ? "is-loaded" : ""}`}>
       {(["g", "r", "b"] as const).map((c) => (
@@ -196,6 +210,36 @@ function ViewerImage({ photo }: { photo: Photo }) {
   return <CAImage src={ready === photo.full ? photo.full : photo.src} />;
 }
 
+type SlotProps = {
+  it: Slot;
+  index: number;
+  src: string;
+  live: boolean;
+  lite: boolean;
+  register: (index: number, el: HTMLButtonElement | null) => void;
+  onOpen: (photo: number) => void;
+};
+
+const TunnelSlot = memo(function TunnelSlot({ it, index, src, live, lite, register, onOpen }: SlotProps) {
+  return (
+    <button
+      type="button"
+      tabIndex={-1}
+      aria-label={rgCode(it.photo)}
+      className={`photo ${it.red ? "is-red" : ""}`}
+      ref={(el) => register(index, el)}
+      style={{ width: it.w, visibility: "hidden" }}
+      onClick={() => onOpen(it.photo)}
+    >
+      {/* Mounted only near the camera (a little beyond the draw distance, so it is loaded before it shows). */}
+      {live && <CAImage src={src} lite={lite} />}
+      <span className="photo-code" aria-hidden="true">
+        {rgCode(it.photo)}
+      </span>
+    </button>
+  );
+});
+
 const mod = (n: number, m: number) => ((n % m) + m) % m;
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 
@@ -215,10 +259,11 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
   const [panel, setPanel] = useState<"index" | "info" | null>(null);
   const [started, setStarted] = useState(false);
   const [year, setYear] = useState<number | null>(null);
-  const [far, setFar] = useState(FAR);
-  // Slot the camera is at. Only the photos just ahead of it get their image
+  const [lite, setLite] = useState(false);
+  const far = lite ? FAR_PHONE : FAR;
+  // Block of slots the camera is in. Only the photos just ahead of it get their image
   // mounted, so the tunnel never loads the whole collection at once.
-  const [camSlot, setCamSlot] = useState(0);
+  const [camChunk, setCamChunk] = useState(0);
 
   const els = useRef<(HTMLButtonElement | null)[]>([]);
   const counterRef = useRef<HTMLSpanElement>(null);
@@ -245,7 +290,7 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
 
   useEffect(() => {
     const mq = window.matchMedia(PHONE_QUERY);
-    const update = () => setFar(mq.matches ? FAR_PHONE : FAR);
+    const update = () => setLite(mq.matches);
     update();
     mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
@@ -253,6 +298,8 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
 
   // High-ISO noise: build the tiles once, then jump them to a random offset
   // ~24 times a second so the grain boils like video from a sensor at max ISO.
+  // The layers are one tile larger than the screen and are moved with a
+  // transform, which the GPU does without repainting anything.
   useEffect(() => {
     const lum = lumRef.current;
     const chroma = chromaRef.current;
@@ -261,15 +308,19 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
     lum.style.backgroundImage = `url(${lumTile})`;
     // Same tile, static, is the film grain of the opened photo.
     rootRef.current?.style.setProperty("--grain", `url(${lumTile})`);
-    chroma.style.backgroundImage = `url(${noiseTile("chroma")})`;
+    if (!lite) chroma.style.backgroundImage = `url(${noiseTile("chroma")})`;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const rnd = () => `${Math.floor(Math.random() * NOISE_TILE)}px ${Math.floor(Math.random() * NOISE_TILE)}px`;
-    const id = setInterval(() => {
-      lum.style.backgroundPosition = rnd();
-      chroma.style.backgroundPosition = rnd();
-    }, 42);
+    const rnd = () =>
+      `translate3d(${-Math.floor(Math.random() * NOISE_TILE)}px, ${-Math.floor(Math.random() * NOISE_TILE)}px, 0)`;
+    const id = setInterval(
+      () => {
+        lum.style.transform = rnd();
+        if (!lite) chroma.style.transform = rnd();
+      },
+      lite ? 84 : 42,
+    );
     return () => clearInterval(id);
-  }, []);
+  }, [lite]);
 
   // Animation loop.
   useEffect(() => {
@@ -280,7 +331,9 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
     let lastCa = -1;
     let lastYear: number | null | undefined;
     let lastFrame = -1;
-    let lastCam = -1;
+    let lastChunk = -1;
+    // Last visibility written per slot, so hidden photos are not touched every frame.
+    const shown: boolean[] = [];
 
     const tick = (now: number) => {
       const k = Math.min(4, (now - last) / (1000 / 60)); // 1 at 60 fps
@@ -309,17 +362,18 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
       const ky = Math.min(1, Math.max(0.6, halfH / 450));
       // Aberration in screen px: zero while idle, grows with the actual speed.
       const extra = Math.max(0, Math.abs(vel - cruise) - 0.3);
-      const ca = extra > 0 ? Math.min(CA_MAX, extra * CA_SPEED) : 0;
+      // Lite (phones): no aberration, it needs per-frame filters and repaints.
+      const ca = !lite && extra > 0 ? Math.min(CA_MAX, extra * CA_SPEED) : 0;
       if (rootRef.current && (Math.abs(ca - lastCa) > 0.05 || (ca === 0 && lastCa !== 0))) {
         lastCa = ca;
         rootRef.current.style.setProperty("--ca", `${ca.toFixed(2)}px`);
         rootRef.current.style.setProperty("--ca-k", (ca / CA_MAX).toFixed(3));
       }
 
-      const cam = Math.floor(mod(s.z, loop) / GAP);
-      if (cam !== lastCam) {
-        lastCam = cam;
-        setCamSlot(cam);
+      const chunk = Math.floor(mod(s.z, loop) / (GAP * MOUNT_CHUNK));
+      if (chunk !== lastChunk) {
+        lastChunk = chunk;
+        setCamChunk(chunk);
       }
 
       let nearestD = Infinity;
@@ -340,7 +394,10 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
         const el = els.current[i];
         if (!el) continue;
         if (d < NEAR || d > far) {
-          el.style.visibility = "hidden";
+          if (shown[i] !== false) {
+            el.style.visibility = "hidden";
+            shown[i] = false;
+          }
           continue;
         }
         const p = FOCAL / d;
@@ -349,13 +406,25 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
         const fog = clamp01(1 - d / far) ** 1.4; // emerge out of the dark
         const pass = clamp01((d - NEAR) / 220); // fade as it passes you
         const op = fog * pass;
-        el.style.visibility = "visible";
+        if (shown[i] !== true) {
+          el.style.visibility = "visible";
+          shown[i] = true;
+        }
         el.style.transform = `translate3d(${sx}px, ${sy}px, 0) translate(-50%, -50%) scale(${p}) rotate(${it.tilt}deg)`;
-        el.style.opacity = op.toFixed(3);
-        el.style.filter = `brightness(${((0.35 + 0.75 * fog) * it.light).toFixed(3)})`;
+        const light = (0.35 + 0.75 * fog) * it.light;
+        if (lite) {
+          // On black, dimming with opacity looks the same as brightness() and costs nothing.
+          el.style.opacity = (op * Math.min(1, light)).toFixed(3);
+        } else {
+          el.style.opacity = op.toFixed(3);
+          el.style.filter = `brightness(${light.toFixed(3)})`;
+        }
         // Keep hairlines and labels a steady size on screen whatever the photo's scale.
         el.style.setProperty("--px", (1 / p).toFixed(4));
         el.style.setProperty("--fs", `${(Math.min(14, Math.max(7, 10 * Math.sqrt(p))) / p).toFixed(2)}px`);
+        el.style.zIndex = String(Math.round(far - d));
+        el.style.pointerEvents = op > 0.3 ? "auto" : "none";
+        if (lite) continue;
         // Lens-like: fringes point away from the centre and grow towards the edges.
         // Divided by the scale so the shift is in screen px whatever the photo's size.
         const rx = (sx - halfW) / diag;
@@ -364,8 +433,6 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
         const len = Math.hypot(rx, ry) || 1;
         el.style.setProperty("--cax", `${((rx / len) * amt).toFixed(2)}px`);
         el.style.setProperty("--cay", `${((ry / len) * amt * 0.5).toFixed(2)}px`);
-        el.style.zIndex = String(Math.round(far - d));
-        el.style.pointerEvents = op > 0.3 ? "auto" : "none";
       }
       if (nearestYear !== lastYear) {
         lastYear = nearestYear;
@@ -381,7 +448,7 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [slots, loop, photos, far]);
+  }, [slots, loop, photos, far, lite]);
 
   // Occasional glitch: every few seconds one visible photo tears for a moment.
   // Punctual on purpose — never constant.
@@ -481,30 +548,27 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
   };
 
   const openPhoto = open !== null ? photos[open] : null;
+  const onOpen = useCallback((photo: number) => {
+    if (!drag.current || drag.current.moved < 6) setOpen(photo);
+  }, []);
+  const register = useCallback((index: number, el: HTMLButtonElement | null) => {
+    els.current[index] = el;
+  }, []);
+  const mountFrom = camChunk * MOUNT_CHUNK * GAP;
 
   return (
-    <main className="tunnel" ref={rootRef}>
+    <main className={`tunnel ${lite ? "is-lite" : ""}`} ref={rootRef}>
       {slots.map((it, i) => (
-        <button
+        <TunnelSlot
           key={i}
-          type="button"
-          tabIndex={-1}
-          aria-label={rgCode(it.photo)}
-          className={`photo ${it.red ? "is-red" : ""}`}
-          ref={(el) => {
-            els.current[i] = el;
-          }}
-          style={{ width: it.w, visibility: "hidden" }}
-          onClick={() => {
-            if (!drag.current || drag.current.moved < 6) setOpen(it.photo);
-          }}
-        >
-          {/* Mounted only near the camera (a little beyond the draw distance, so it is loaded before it shows). */}
-          {mod(it.z - camSlot * GAP, loop) < far + 3 * GAP && <CAImage src={photos[it.photo].src} />}
-          <span className="photo-code" aria-hidden="true">
-            {rgCode(it.photo)}
-          </span>
-        </button>
+          it={it}
+          index={i}
+          src={photos[it.photo].src}
+          live={mod(it.z - mountFrom, loop) < far + (MOUNT_CHUNK + 3) * GAP}
+          lite={lite}
+          register={register}
+          onOpen={onOpen}
+        />
       ))}
 
       <div className="progress" aria-hidden="true">

@@ -47,7 +47,7 @@
   padding: 0;
   background: transparent;
   isolation: isolate;
-  will-change: transform, opacity, filter;
+  will-change: transform, opacity;
 }
 .tunnel .red { color: var(--red); }
 
@@ -162,6 +162,12 @@
   pointer-events: none;
 }
 .tunnel .ca-g img { height: auto; }
+/* Phones: one plain greyscale image per photo, no channels or blend modes. */
+.tunnel .ca-lite { isolation: auto; }
+.tunnel .ca-lite img { height: auto; mix-blend-mode: normal; }
+.tunnel.is-lite .photo { isolation: auto; }
+.tunnel.is-lite .fringe,
+.tunnel.is-lite .iso-chroma { display: none; }
 
 /* Text and UI images: red / cyan ghosts that widen with speed (--ca is set on .tunnel). */
 .tunnel { --ca: 0px; }
@@ -220,8 +226,13 @@
   inset: 0;
   pointer-events: none;
   z-index: 300000; /* over everything, panels and the open photo included */
+  /* One tile larger than the screen to the right and bottom: the layer is
+     moved up/left by up to one tile with a transform (no repaint). */
+  right: -256px;
+  bottom: -256px;
   background-repeat: repeat;
   mix-blend-mode: overlay;
+  will-change: transform;
 }
 .tunnel .iso-lum { opacity: 0.28; }
 .tunnel .iso-chroma { opacity: 0.07; }
