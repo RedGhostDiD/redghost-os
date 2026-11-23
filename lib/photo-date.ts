@@ -1,8 +1,7 @@
 /**
  * The date a photo was taken, read from its EXIF in the browser before the
- * metadata is stripped. Works on JPEG and on TIFF-based camera RAW files
- * (DNG, CR2, NEF, ARW, ORF, RW2, PEF…); other files (RAF, CR3, HEIC…) fall back
- * to the first EXIF-style date found in the file.
+ * metadata is stripped. Works on JPEG and TIFF; other files (HEIC, PNG…) fall
+ * back to the first EXIF-style date found in the file.
  *
  * Stored as "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM".
  */
@@ -75,7 +74,7 @@ function jpegExifBase(v: DataView): number {
 }
 
 export async function readPhotoDate(file: Blob): Promise<string | null> {
-  // EXIF is near the start; RAW files can keep it a bit further in.
+  // EXIF is near the start of the file.
   const buf = await file.slice(0, 4 * 1024 * 1024).arrayBuffer();
   const v = new DataView(buf);
   if (v.byteLength < 12) return null;
