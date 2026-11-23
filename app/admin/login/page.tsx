@@ -4,12 +4,14 @@ import { redirect } from "next/navigation";
 export default async function AdminLoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; from?: string }>;
 }) {
-  const session = await auth();
-  if (session?.user) redirect("/admin");
+  const { error, from } = await searchParams;
+  // Only known pages, never a URL from the query string (no open redirect).
+  const target = from === "tunel" ? "/tunel/admin" : "/admin";
 
-  const { error } = await searchParams;
+  const session = await auth();
+  if (session?.user) redirect(target);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-dvh gap-6 px-4">
@@ -37,7 +39,7 @@ export default async function AdminLoginPage({
       <form
         action={async () => {
           "use server";
-          await signIn("github", { redirectTo: "/admin" });
+          await signIn("github", { redirectTo: target });
         }}
       >
         <button

@@ -2,6 +2,7 @@ import { Octokit } from "@octokit/rest";
 import type { Project } from "@/lib/projects";
 import type { SiteConfig } from "@/lib/site-config";
 import type { WallPost } from "@/lib/wall";
+import { isTunelPhoto, type TunelPhoto } from "@/lib/tunel";
 
 const PROJECTS_PATH = "data/projects.json";
 const SITE_CONFIG_PATH = "data/site-config.json";
@@ -110,4 +111,65 @@ export async function uploadPublicFile(
   const existing = await getFile(fullPath);
   await putFile(fullPath, contentBase64, message, existing?.sha);
   return `/uploads/${safeRelative}`;
+}
+
+// ---------- /tunel photo archive ----------
+
+const TUNEL_PATH = "data/tunel.json";
+
+export async function readTunelPhotos(): Promise<TunelPhoto[]> {
+  const file = await getFile(TUNEL_PATH);
+  if (!file) return [];
+  const raw = JSON.parse(Buffer.from(file.contentBase64, "base64").toString("utf-8")) as unknown;
+  return Array.isArray(raw) ? raw.filter(isTunelPhoto) : [];
+}
+
+/**
+ * Stores an image as a git blob without committing it. The blob only becomes
+ * part of the repo when commitTunel() references it, so several photos can be
+ * uploaded one by one (each request stays under Vercel's body limit) and then
+ * published together in a single commit / single redeploy.
+ */
+export async function createImageBlob(contentBase64: string): Promise<string> {
+  const { owner, repo, octokit } = config();
+  const res = await octokit.git.createBlob({ owner, repo, content: contentBase64, encoding: "base64" });
+  return res.data.sha;
+}
+
+/**
+ * Writes data/tunel.json, adds the new image blobs and deletes the images of
+ * removed photos, all in one commit on the configured branch.
+ */
+export async function commitTunel(
+  photos: TunelPhoto[],
+  added: { path: string; blobSha: string }[],
+  removedPaths: string[],
+  message: string
+): Promise<string> {
+  const { owner, repo, branch, octokit } = config();
+  const ref = await octokit.git.getRef({ owner, repo, ref: `heads/${branch}` });
+  const headSha = ref.data.object.sha;
+  const head = await octokit.git.getCommit({ owner, repo, commit_sha: headSha });
+
+  const json = JSON.stringify(photos, null, 2) + "\n";
+  const tree = await octokit.git.createTree({
+    owner,
+    repo,
+    base_tree: head.data.tree.sha,
+    tree: [
+      { path: TUNEL_PATH, mode: "100644", type: "blob", content: json },
+      ...added.map((a) => ({ path: a.path, mode: "100644" as const, type: "blob" as const, sha: a.blobSha })),
+      ...removedPaths.map((p) => ({ path: p, mode: "100644" as const, type: "blob" as const, sha: null })),
+    ],
+  });
+  const commit = await octokit.git.createCommit({
+    owner,
+    repo,
+    message,
+    tree: tree.data.sha,
+    parents: [headSha],
+  });
+  // Not forced: if someone pushed in between, this fails instead of overwriting.
+  await octokit.git.updateRef({ owner, repo, ref: `heads/${branch}`, sha: commit.data.sha });
+  return commit.data.sha;
 }
