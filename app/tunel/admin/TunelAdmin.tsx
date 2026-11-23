@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { sortTunelPhotos, type TunelPhoto, type TunelSettings } from "@/lib/tunel";
 import { readPhotoDate } from "@/lib/photo-date";
+import { developRaw, isRawFile, RAW_ACCEPT } from "@/lib/raw-develop";
 
 /** A photo in the editor; new ones carry the git blobs made on upload. */
 type Item = TunelPhoto & { pending?: { ext: string; blobSha: string; fullBlobSha: string } };
@@ -116,14 +117,17 @@ export default function TunelAdmin({
     setMessage(null);
     const chosenYear = yearValue(uploadYear);
     for (const file of Array.from(files)) {
-      if (!file.type.startsWith("image/")) continue;
+      const raw = isRawFile(file);
+      if (!raw && !file.type.startsWith("image/")) continue;
       const key = newId();
       setUploads((u) => [...u, { key, name: file.name, status: "subiendo" }]);
       try {
         // Date taken, read before the metadata is stripped. Its year wins over the selected one.
-        const date = (await readPhotoDate(file)) ?? undefined;
+        // RAW: developed here (LibRaw) and then saved as JPEG like any other photo.
+        const developed = raw ? await developRaw(file) : null;
+        const date = (developed?.date ?? (await readPhotoDate(file))) ?? undefined;
         const year = date ? Number(date.slice(0, 4)) : chosenYear;
-        const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+        const bitmap = developed?.bitmap ?? (await createImageBitmap(file, { imageOrientation: "from-image" }));
         let light: Blob, full: Blob;
         try {
           light = await encodeJpeg(bitmap, LIGHT_SIDE, LIGHT_QUALITY);
@@ -283,12 +287,12 @@ export default function TunelAdmin({
             + ELEGIR FOTOS
           </button>
           <span className="text-[10px]" style={{ color: "var(--rg-text-faint)" }}>
-            o arrástralas aquí. La fecha se lee de la foto (puedes cambiarla abajo). El túnel usa una versión ligera; al abrir la foto se ve la original. Se borran los metadatos (ubicación incluida).
+            o arrástralas aquí. También acepta RAW (.dng, .cr2, .nef, .arw, .raf…): se revela aquí y se guarda en JPEG. La fecha se lee de la foto (puedes cambiarla abajo). El túnel usa una versión ligera; al abrir la foto se ve la original. Se borran los metadatos (ubicación incluida).
           </span>
           <input
             ref={fileInput}
             type="file"
-            accept="image/*"
+            accept={`image/*,${RAW_ACCEPT}`}
             multiple
             hidden
             onChange={(e) => {
