@@ -162,11 +162,10 @@
   pointer-events: none;
 }
 .tunnel .ca-g img { height: auto; }
-/* Phones: one plain greyscale image per photo, no channels or blend modes. */
+/* Phones: far photos are one plain greyscale image (no channels or blend modes);
+   the colour-noise layer is off. */
 .tunnel .ca-lite { isolation: auto; }
 .tunnel .ca-lite img { height: auto; mix-blend-mode: normal; }
-.tunnel.is-lite .photo { isolation: auto; }
-.tunnel.is-lite .fringe,
 .tunnel.is-lite .iso-chroma { display: none; }
 
 /* Text and UI images: red / cyan ghosts that widen with speed (--ca is set on .tunnel). */

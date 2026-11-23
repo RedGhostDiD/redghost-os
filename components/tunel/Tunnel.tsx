@@ -37,12 +37,18 @@ const NEAR = 60;
 const FAR = 4200;
 // Phones draw photos up to a shorter distance, so ~16 are on screen instead of ~30.
 const FAR_PHONE = 2300;
-// Phones and tablets: "lite" rendering (one image per photo, no per-frame
-// filters, lighter grain) so the tunnel keeps a smooth frame rate.
+// Phones and tablets: "lite" rendering (no per-frame brightness filter,
+// lighter grain, shorter draw distance) so the tunnel keeps a smooth frame rate.
+// The chromatic aberration stays on, but only the nearest photos (the big ones,
+// where it shows) get the three colour channels; the far ones are one image.
 const PHONE_QUERY = "(max-width: 768px), (pointer: coarse)";
 // Images are mounted in blocks of this many slots, so React re-renders
 // rarely even when scrolling fast.
 const MOUNT_CHUNK = 4;
+// Lite: photos this far past the start of the camera's block get the full aberration.
+const RICH_DEPTH = (MOUNT_CHUNK + 5) * GAP;
+// Lite: photos are drawn smaller (fewer pixels to blend, and they fit a narrow screen).
+const PHONE_SIZE = 0.7;
 const RING_X = 900; // ring the photos are arranged on
 const RING_Y = 560;
 const BASE_SPEED = 2.2; // depth units per 60 fps frame
@@ -216,11 +222,12 @@ type SlotProps = {
   src: string;
   live: boolean;
   lite: boolean;
+  small: boolean;
   register: (index: number, el: HTMLButtonElement | null) => void;
   onOpen: (photo: number) => void;
 };
 
-const TunnelSlot = memo(function TunnelSlot({ it, index, src, live, lite, register, onOpen }: SlotProps) {
+const TunnelSlot = memo(function TunnelSlot({ it, index, src, live, lite, small, register, onOpen }: SlotProps) {
   return (
     <button
       type="button"
@@ -228,7 +235,7 @@ const TunnelSlot = memo(function TunnelSlot({ it, index, src, live, lite, regist
       aria-label={rgCode(it.photo)}
       className={`photo ${it.red ? "is-red" : ""}`}
       ref={(el) => register(index, el)}
-      style={{ width: it.w, visibility: "hidden" }}
+      style={{ width: small ? it.w * PHONE_SIZE : it.w, visibility: "hidden" }}
       onClick={() => onOpen(it.photo)}
     >
       {/* Mounted only near the camera (a little beyond the draw distance, so it is loaded before it shows). */}
@@ -334,6 +341,7 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
     let lastChunk = -1;
     // Last visibility written per slot, so hidden photos are not touched every frame.
     const shown: boolean[] = [];
+    const still: boolean[] = [];
 
     const tick = (now: number) => {
       const k = Math.min(4, (now - last) / (1000 / 60)); // 1 at 60 fps
@@ -362,8 +370,7 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
       const ky = Math.min(1, Math.max(0.6, halfH / 450));
       // Aberration in screen px: zero while idle, grows with the actual speed.
       const extra = Math.max(0, Math.abs(vel - cruise) - 0.3);
-      // Lite (phones): no aberration, it needs per-frame filters and repaints.
-      const ca = !lite && extra > 0 ? Math.min(CA_MAX, extra * CA_SPEED) : 0;
+      const ca = extra > 0 ? Math.min(CA_MAX, extra * CA_SPEED) : 0;
       if (rootRef.current && (Math.abs(ca - lastCa) > 0.05 || (ca === 0 && lastCa !== 0))) {
         lastCa = ca;
         rootRef.current.style.setProperty("--ca", `${ca.toFixed(2)}px`);
@@ -424,7 +431,16 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
         el.style.setProperty("--fs", `${(Math.min(14, Math.max(7, 10 * Math.sqrt(p))) / p).toFixed(2)}px`);
         el.style.zIndex = String(Math.round(far - d));
         el.style.pointerEvents = op > 0.3 ? "auto" : "none";
-        if (lite) continue;
+        // Idle (no aberration): the fringe offsets are only reset once, not every frame.
+        if (ca === 0) {
+          if (!still[i]) {
+            el.style.setProperty("--cax", "0px");
+            el.style.setProperty("--cay", "0px");
+            still[i] = true;
+          }
+          continue;
+        }
+        still[i] = false;
         // Lens-like: fringes point away from the centre and grow towards the edges.
         // Divided by the scale so the shift is in screen px whatever the photo's size.
         const rx = (sx - halfW) / diag;
@@ -565,7 +581,8 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
           index={i}
           src={photos[it.photo].src}
           live={mod(it.z - mountFrom, loop) < far + (MOUNT_CHUNK + 3) * GAP}
-          lite={lite}
+          lite={lite && mod(it.z - mountFrom, loop) >= RICH_DEPTH}
+          small={lite}
           register={register}
           onOpen={onOpen}
         />
