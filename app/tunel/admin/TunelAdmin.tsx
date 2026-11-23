@@ -92,6 +92,9 @@ export default function TunelAdmin({
   // Local previews for photos whose files are not deployed yet.
   const previews = useRef(new Map<string, string>());
   const fileInput = useRef<HTMLInputElement>(null);
+  // Separate picker for RAW: mixing RAW extensions into the photo picker makes
+  // phones show a plain file chooser (no Google Photos).
+  const rawInput = useRef<HTMLInputElement>(null);
 
   const ordered = useMemo(() => sortTunelPhotos(items), [items]);
   const dirty = useMemo(
@@ -286,13 +289,32 @@ export default function TunelAdmin({
           >
             + ELEGIR FOTOS
           </button>
+          <button
+            type="button"
+            onClick={() => rawInput.current?.click()}
+            className="text-xs tracking-[0.15em] px-4 py-2.5 border"
+            style={{ ...line, color: "var(--rg-text-dim)" }}
+          >
+            + RAW
+          </button>
           <span className="text-[10px]" style={{ color: "var(--rg-text-faint)" }}>
-            o arrástralas aquí. También acepta RAW (.dng, .cr2, .nef, .arw, .raf…): se revela aquí y se guarda en JPEG. La fecha se lee de la foto (puedes cambiarla abajo). El túnel usa una versión ligera; al abrir la foto se ve la original. Se borran los metadatos (ubicación incluida).
+            o arrástralas aquí. Con + RAW (.dng, .cr2, .nef, .arw, .raf…) la foto se revela aquí y se guarda en JPEG. La fecha se lee de la foto (puedes cambiarla abajo). El túnel usa una versión ligera; al abrir la foto se ve la original. Se borran los metadatos (ubicación incluida).
           </span>
           <input
             ref={fileInput}
             type="file"
-            accept={`image/*,${RAW_ACCEPT}`}
+            accept="image/*"
+            multiple
+            hidden
+            onChange={(e) => {
+              if (e.target.files) addFiles(e.target.files);
+              e.target.value = "";
+            }}
+          />
+          <input
+            ref={rawInput}
+            type="file"
+            accept={RAW_ACCEPT}
             multiple
             hidden
             onChange={(e) => {
