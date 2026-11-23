@@ -565,6 +565,19 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
   };
 
   const openPhoto = open !== null ? photos[open] : null;
+  // INDEX order: oldest date first; photos without a date go after the dated ones.
+  const byDate = useMemo(
+    () =>
+      photos
+        .map((_, i) => i)
+        .sort((a, b) => {
+          const da = photos[a].date;
+          const db = photos[b].date;
+          if (!da || !db) return (da ? 0 : 1) - (db ? 0 : 1) || a - b;
+          return da < db ? -1 : da > db ? 1 : a - b;
+        }),
+    [photos],
+  );
   const onOpen = useCallback((photo: number) => {
     if (!drag.current || drag.current.moved < 6) setOpen(photo);
   }, []);
@@ -659,15 +672,15 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
                   <span className="year-text">sin año</span>
                 )}
                 <div className="index-grid">
-                  {photos.map((p, i) =>
-                    p.year === y ? (
+                  {byDate
+                    .filter((i) => photos[i].year === y)
+                    .map((i) => (
                       <button key={i} type="button" className="ui-btn thumb" onClick={() => setOpen(i)}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={p.src} alt={rgCode(i)} loading="lazy" draggable={false} />
+                        <img src={photos[i].src} alt={rgCode(i)} loading="lazy" draggable={false} />
                         <span className="thumb-code">{rgCode(i)}</span>
                       </button>
-                    ) : null,
-                  )}
+                    ))}
                 </div>
               </div>
             ))}
