@@ -1,5 +1,6 @@
 import tunelData from "@/data/tunel.json";
 import tunelSettings from "@/data/tunel-settings.json";
+import { PHOTO_DATE_RE } from "@/lib/photo-date";
 
 /**
  * Photos of the /tunel archive. Sourced from data/tunel.json, which the
@@ -15,6 +16,8 @@ export interface TunelPhoto {
   full?: string;
   /** Year section of the tunnel, or null for photos without a year. */
   year: number | null;
+  /** When it was taken: "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM". Read from the photo on upload, editable in the admin. */
+  date?: string;
 }
 
 /** Tunnel options edited in the CONFIGURACIÓN section of /tunel/admin (data/tunel-settings.json). */
@@ -49,6 +52,7 @@ export function isTunelPhoto(v: unknown): v is TunelPhoto {
     /^[a-z0-9-]{4,40}$/.test(p.id) &&
     typeof p.src === "string" &&
     (p.full === undefined || typeof p.full === "string") &&
+    (p.date === undefined || (typeof p.date === "string" && PHOTO_DATE_RE.test(p.date))) &&
     (p.year === null || (typeof p.year === "number" && Number.isInteger(p.year) && p.year >= 1900 && p.year <= 2100))
   );
 }

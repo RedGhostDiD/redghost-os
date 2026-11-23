@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { formatPhotoDate } from "@/lib/photo-date";
 
 /**
  * Black-and-white photo tunnel. Photos sit around a ring at different depths
@@ -11,7 +12,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
  */
 
 /** src: light version for the tunnel; full: original quality, shown when opened. */
-export type Photo = { src: string; full?: string; year: number | null };
+export type Photo = { src: string; full?: string; year: number | null; date?: string };
 
 /** Text shown in the INFO panel — edit freely. */
 const MOTTO = "REDGHOST // BUILT FROM SCRAPS. MADE TO REMAIN.";
@@ -706,6 +707,7 @@ export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grai
               {frameCode(open!, photos.length)} · {COLLECTION}
             </span>
             <span>ARCHIVE / {openPhoto.year ?? "—"}</span>
+            {openPhoto.date && <span className="viewer-date">DATE / {formatPhotoDate(openPhoto.date)}</span>}
           </div>
           {openPhoto.year !== null && (
             <div className="viewer-year">

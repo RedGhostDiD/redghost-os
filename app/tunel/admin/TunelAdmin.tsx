@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { sortTunelPhotos, type TunelPhoto, type TunelSettings } from "@/lib/tunel";
+import { isRawFile, RAW_ACCEPT, rawToBitmap } from "@/lib/raw-preview";
+import { readPhotoDate } from "@/lib/photo-date";
 
 /** A photo in the editor; new ones carry the git blobs made on upload. */
 type Item = TunelPhoto & { pending?: { ext: string; blobSha: string; fullBlobSha: string } };
@@ -94,8 +96,8 @@ export default function TunelAdmin({
   const ordered = useMemo(() => sortTunelPhotos(items), [items]);
   const dirty = useMemo(
     () =>
-      JSON.stringify(ordered.map(({ id, year }) => [id, year])) !==
-        JSON.stringify(sortTunelPhotos(saved).map(({ id, year }) => [id, year])) ||
+      JSON.stringify(ordered.map(({ id, year, date }) => [id, year, date ?? null])) !==
+        JSON.stringify(sortTunelPhotos(saved).map(({ id, year, date }) => [id, year, date ?? null])) ||
       JSON.stringify(settings) !== JSON.stringify(savedSettings),
     [ordered, saved, settings, savedSettings]
   );
@@ -113,13 +115,19 @@ export default function TunelAdmin({
 
   async function addFiles(files: FileList | File[]) {
     setMessage(null);
-    const year = yearValue(uploadYear);
+    const chosenYear = yearValue(uploadYear);
     for (const file of Array.from(files)) {
-      if (!file.type.startsWith("image/")) continue;
+      const raw = isRawFile(file);
+      if (!raw && !file.type.startsWith("image/")) continue;
       const key = newId();
       setUploads((u) => [...u, { key, name: file.name, status: "subiendo" }]);
       try {
-        const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+        // Date taken, read before the metadata is stripped. Its year wins over the selected one.
+        const date = (await readPhotoDate(file)) ?? undefined;
+        const year = date ? Number(date.slice(0, 4)) : chosenYear;
+        const bitmap = raw
+          ? await rawToBitmap(file)
+          : await createImageBitmap(file, { imageOrientation: "from-image" });
         let light: Blob, full: Blob;
         try {
           light = await encodeJpeg(bitmap, LIGHT_SIDE, LIGHT_QUALITY);
@@ -130,7 +138,7 @@ export default function TunelAdmin({
         const [blobSha, fullBlobSha] = await Promise.all([uploadBlob(light), uploadBlob(full)]);
         const preview = URL.createObjectURL(light);
         previews.current.set(key, preview);
-        setItems((list) => [...list, { id: key, src: preview, year, pending: { ext: "jpg", blobSha, fullBlobSha } }]);
+        setItems((list) => [...list, { id: key, src: preview, year, date, pending: { ext: "jpg", blobSha, fullBlobSha } }]);
         setUploads((u) => u.filter((x) => x.key !== key));
       } catch (err) {
         const text = err instanceof Error ? err.message : "Error al subir";
@@ -141,6 +149,17 @@ export default function TunelAdmin({
 
   function setYear(id: string, year: number | null) {
     setItems((list) => list.map((p) => (p.id === id ? { ...p, year } : p)));
+  }
+
+  /** Date taken (empty = none). Changing it also moves the photo to that year. */
+  function setDate(id: string, day: string, time: string) {
+    setItems((list) =>
+      list.map((p) => {
+        if (p.id !== id) return p;
+        if (!day) return { ...p, date: undefined };
+        return { ...p, date: time ? `${day}T${time}` : day, year: Number(day.slice(0, 4)) };
+      })
+    );
   }
 
   function remove(id: string, code: string) {
@@ -175,7 +194,7 @@ export default function TunelAdmin({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          photos: ordered.map(({ id, year }) => ({ id, year })),
+          photos: ordered.map(({ id, year, date }) => ({ id, year, date })),
           added: ordered.filter((p) => p.pending).map((p) => ({ id: p.id, ...p.pending })),
           settings,
         }),
@@ -268,12 +287,12 @@ export default function TunelAdmin({
             + ELEGIR FOTOS
           </button>
           <span className="text-[10px]" style={{ color: "var(--rg-text-faint)" }}>
-            o arrástralas aquí. El túnel usa una versión ligera; al abrir la foto se ve la original. Se borran los metadatos (ubicación incluida).
+            o arrástralas aquí. La fecha se lee de la foto (puedes cambiarla abajo). El túnel usa una versión ligera; al abrir la foto se ve la original. También acepta RAW (.dng, .cr2, .nef, .arw, .raf, .raw…). Se borran los metadatos (ubicación incluida).
           </span>
           <input
             ref={fileInput}
             type="file"
-            accept="image/*"
+            accept={`image/*,${RAW_ACCEPT}`}
             multiple
             hidden
             onChange={(e) => {
@@ -394,6 +413,28 @@ export default function TunelAdmin({
                   </span>
                 </div>
                 <figcaption className="flex flex-wrap items-center gap-1.5 p-2">
+                  <div className="w-full flex flex-wrap items-center gap-1.5">
+                    <input
+                      type="date"
+                      value={photo.date?.slice(0, 10) ?? ""}
+                      min="1900-01-01"
+                      max="2100-12-31"
+                      onChange={(e) => setDate(photo.id, e.target.value, photo.date?.slice(11) ?? "")}
+                      aria-label="Fecha de la foto"
+                      title={photo.date ? "Fecha de la foto" : "Sin fecha: la foto no la traía. Escríbela aquí."}
+                      className="bg-transparent border px-1 py-1 text-[11px] min-w-0 flex-1"
+                      style={{ ...line, color: photo.date ? "var(--rg-text)" : "var(--rg-text-faint)", colorScheme: "dark" }}
+                    />
+                    <input
+                      type="time"
+                      value={photo.date?.slice(11) ?? ""}
+                      disabled={!photo.date}
+                      onChange={(e) => setDate(photo.id, photo.date!.slice(0, 10), e.target.value)}
+                      aria-label="Hora de la foto"
+                      className="bg-transparent border px-1 py-1 text-[11px] w-[5.5rem] disabled:opacity-40"
+                      style={{ ...line, color: "var(--rg-text)", colorScheme: "dark" }}
+                    />
+                  </div>
                   <select
                     value={photo.year ?? ""}
                     onChange={(e) => setYear(photo.id, yearValue(e.target.value))}

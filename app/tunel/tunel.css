@@ -463,8 +463,21 @@
   display: grid;
   place-items: center;
   padding: 48px 16px;
-  background: #000;
+  /* The tunnel stays behind, blurred and darkened, instead of a black screen.
+     It is paused while a photo is open, so the blur is not redone every frame. */
+  background: rgba(0, 0, 0, 0.45);
+  -webkit-backdrop-filter: blur(18px) saturate(0.8);
+  backdrop-filter: blur(18px) saturate(0.8);
   animation: tn-fade 0.3s ease;
+}
+/* Phones: a lighter blur. */
+.tunnel.is-lite .viewer {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+/* No backdrop-filter support: plain dark veil over the tunnel. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .tunnel .viewer { background: rgba(0, 0, 0, 0.82); }
 }
 .tunnel .viewer .ca-g img {
   width: auto;
@@ -503,6 +516,8 @@
 .tunnel .viewer-id span { animation: tn-id-in 0.5s steps(6) both; }
 .tunnel .viewer-id span:nth-child(2) { animation-delay: 0.12s; }
 .tunnel .viewer-id span:nth-child(3) { animation-delay: 0.24s; }
+.tunnel .viewer-id span:nth-child(4) { animation-delay: 0.36s; }
+.tunnel .viewer-date { color: var(--fg, #ebe3d3); }
 .tunnel .viewer-code {
   font-size: 15px;
   color: var(--red);

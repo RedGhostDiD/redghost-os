@@ -21,7 +21,7 @@ type Added = { id: string; ext: string; blobSha: string; fullBlobSha: string };
 
 /**
  * Saves the whole list in one commit. Body:
- *   photos: the final list (id + year; src is decided here, never trusted)
+ *   photos: the final list (id + year + optional date; src is decided here, never trusted)
  *   added:  new photos, with the git blob created by /api/admin/tunel/blob
  * Photos missing from the list are removed, and their image files deleted.
  */
@@ -64,8 +64,12 @@ export async function POST(req: NextRequest) {
     }
     seen.add(candidate.id);
     const existing = oldById.get(candidate.id);
+    // Only add "date" when there is one, so the JSON stays clean.
+    const date = candidate.date ? { date: candidate.date } : {};
     if (existing) {
-      next.push({ ...existing, year: candidate.year });
+      const { date: _old, ...rest } = existing;
+      void _old;
+      next.push({ ...rest, year: candidate.year, ...date });
       continue;
     }
     const a = added.get(candidate.id);
@@ -76,7 +80,7 @@ export async function POST(req: NextRequest) {
     const relFull = `${dir}/${a.id}-full.${a.ext}`;
     files.push({ path: `${TUNEL_UPLOAD_DIR}/${rel}`, blobSha: a.blobSha });
     files.push({ path: `${TUNEL_UPLOAD_DIR}/${relFull}`, blobSha: a.fullBlobSha });
-    next.push({ id: a.id, src: `/uploads/tunel/${rel}`, full: `/uploads/tunel/${relFull}`, year: candidate.year });
+    next.push({ id: a.id, src: `/uploads/tunel/${rel}`, full: `/uploads/tunel/${relFull}`, year: candidate.year, ...date });
   }
 
   const removed = old

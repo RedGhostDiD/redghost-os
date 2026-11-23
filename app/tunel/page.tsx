@@ -11,6 +11,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: "#000000" };
 
 export default function TunelPage() {
-  const photos = getTunelPhotos().map(({ src, full, year }) => ({ src, full, year }));
+  const photos = getTunelPhotos().map(({ src, full, year, date }) => ({ src, full, year, date }));
   return <Tunnel photos={photos} grain={getTunelSettings().viewerGrain} />;
 }
