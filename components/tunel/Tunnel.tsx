@@ -10,7 +10,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
  * travels through the years. Scroll / drag / swipe / arrow keys change speed.
  */
 
-export type Photo = { src: string; year: number | null };
+/** src: light version for the tunnel; full: original quality, shown when opened. */
+export type Photo = { src: string; full?: string; year: number | null };
 
 /** Text shown in the INFO panel — edit freely. */
 const MOTTO = "REDGHOST // BUILT FROM SCRAPS. MADE TO REMAIN.";
@@ -34,6 +35,9 @@ const GAP = 140; // depth between consecutive photos
 const FOCAL = 600;
 const NEAR = 60;
 const FAR = 4200;
+// Phones draw photos up to a shorter distance, so ~16 are on screen instead of ~30.
+const FAR_PHONE = 2300;
+const PHONE_QUERY = "(max-width: 768px)";
 const RING_X = 900; // ring the photos are arranged on
 const RING_Y = 560;
 const BASE_SPEED = 2.2; // depth units per 60 fps frame
@@ -173,10 +177,33 @@ function CloseButton({ onClick }: { onClick: () => void }) {
   );
 }
 
+/**
+ * The opened photo: shows the light version at once (already loaded by the
+ * tunnel) and swaps in the original quality as soon as it has downloaded.
+ */
+function ViewerImage({ photo }: { photo: Photo }) {
+  const [ready, setReady] = useState<string | null>(null);
+  useEffect(() => {
+    if (!photo.full || photo.full === photo.src) return;
+    const img = new Image();
+    img.decoding = "async";
+    img.onload = () => setReady(photo.full!);
+    img.src = photo.full;
+    return () => {
+      img.onload = null;
+    };
+  }, [photo.full, photo.src]);
+  return <CAImage src={ready === photo.full ? photo.full : photo.src} />;
+}
+
 const mod = (n: number, m: number) => ((n % m) + m) % m;
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 
-export default function Tunnel({ photos }: { photos: Photo[] }) {
+/**
+ * photos: the collection, ordered by year.
+ * grain:  film grain over the opened photo (set in /tunel/admin → CONFIGURACIÓN).
+ */
+export default function Tunnel({ photos, grain = true }: { photos: Photo[]; grain?: boolean }) {
   const slots = useMemo(() => buildSlots(photos.length), [photos.length]);
   const loop = slots.length * GAP;
   const years = useMemo(
@@ -188,6 +215,10 @@ export default function Tunnel({ photos }: { photos: Photo[] }) {
   const [panel, setPanel] = useState<"index" | "info" | null>(null);
   const [started, setStarted] = useState(false);
   const [year, setYear] = useState<number | null>(null);
+  const [far, setFar] = useState(FAR);
+  // Slot the camera is at. Only the photos just ahead of it get their image
+  // mounted, so the tunnel never loads the whole collection at once.
+  const [camSlot, setCamSlot] = useState(0);
 
   const els = useRef<(HTMLButtonElement | null)[]>([]);
   const counterRef = useRef<HTMLSpanElement>(null);
@@ -212,13 +243,24 @@ export default function Tunnel({ photos }: { photos: Photo[] }) {
     state.current.paused = open !== null || panel !== null;
   }, [open, panel]);
 
+  useEffect(() => {
+    const mq = window.matchMedia(PHONE_QUERY);
+    const update = () => setFar(mq.matches ? FAR_PHONE : FAR);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
   // High-ISO noise: build the tiles once, then jump them to a random offset
   // ~24 times a second so the grain boils like video from a sensor at max ISO.
   useEffect(() => {
     const lum = lumRef.current;
     const chroma = chromaRef.current;
     if (!lum || !chroma) return;
-    lum.style.backgroundImage = `url(${noiseTile("lum")})`;
+    const lumTile = noiseTile("lum");
+    lum.style.backgroundImage = `url(${lumTile})`;
+    // Same tile, static, is the film grain of the opened photo.
+    rootRef.current?.style.setProperty("--grain", `url(${lumTile})`);
     chroma.style.backgroundImage = `url(${noiseTile("chroma")})`;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const rnd = () => `${Math.floor(Math.random() * NOISE_TILE)}px ${Math.floor(Math.random() * NOISE_TILE)}px`;
@@ -238,6 +280,7 @@ export default function Tunnel({ photos }: { photos: Photo[] }) {
     let lastCa = -1;
     let lastYear: number | null | undefined;
     let lastFrame = -1;
+    let lastCam = -1;
 
     const tick = (now: number) => {
       const k = Math.min(4, (now - last) / (1000 / 60)); // 1 at 60 fps
@@ -273,6 +316,12 @@ export default function Tunnel({ photos }: { photos: Photo[] }) {
         rootRef.current.style.setProperty("--ca-k", (ca / CA_MAX).toFixed(3));
       }
 
+      const cam = Math.floor(mod(s.z, loop) / GAP);
+      if (cam !== lastCam) {
+        lastCam = cam;
+        setCamSlot(cam);
+      }
+
       let nearestD = Infinity;
       let nearestYear: number | null = null;
       let frameD = Infinity;
@@ -290,14 +339,14 @@ export default function Tunnel({ photos }: { photos: Photo[] }) {
         }
         const el = els.current[i];
         if (!el) continue;
-        if (d < NEAR || d > FAR) {
+        if (d < NEAR || d > far) {
           el.style.visibility = "hidden";
           continue;
         }
         const p = FOCAL / d;
         const sx = halfW + (it.x * kx - s.cx) * p;
         const sy = halfH + (it.y * ky - s.cy) * p;
-        const fog = clamp01(1 - d / FAR) ** 1.4; // emerge out of the dark
+        const fog = clamp01(1 - d / far) ** 1.4; // emerge out of the dark
         const pass = clamp01((d - NEAR) / 220); // fade as it passes you
         const op = fog * pass;
         el.style.visibility = "visible";
@@ -315,7 +364,7 @@ export default function Tunnel({ photos }: { photos: Photo[] }) {
         const len = Math.hypot(rx, ry) || 1;
         el.style.setProperty("--cax", `${((rx / len) * amt).toFixed(2)}px`);
         el.style.setProperty("--cay", `${((ry / len) * amt * 0.5).toFixed(2)}px`);
-        el.style.zIndex = String(Math.round(FAR - d));
+        el.style.zIndex = String(Math.round(far - d));
         el.style.pointerEvents = op > 0.3 ? "auto" : "none";
       }
       if (nearestYear !== lastYear) {
@@ -332,7 +381,7 @@ export default function Tunnel({ photos }: { photos: Photo[] }) {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [slots, loop, photos]);
+  }, [slots, loop, photos, far]);
 
   // Occasional glitch: every few seconds one visible photo tears for a moment.
   // Punctual on purpose — never constant.
@@ -450,7 +499,8 @@ export default function Tunnel({ photos }: { photos: Photo[] }) {
             if (!drag.current || drag.current.moved < 6) setOpen(it.photo);
           }}
         >
-          <CAImage src={photos[it.photo].src} />
+          {/* Mounted only near the camera (a little beyond the draw distance, so it is loaded before it shows). */}
+          {mod(it.z - camSlot * GAP, loop) < far + 3 * GAP && <CAImage src={photos[it.photo].src} />}
           <span className="photo-code" aria-hidden="true">
             {rgCode(it.photo)}
           </span>
@@ -567,8 +617,8 @@ export default function Tunnel({ photos }: { photos: Photo[] }) {
       )}
 
       {openPhoto && (
-        <div className="viewer" role="dialog" aria-modal="true" aria-label="Foto" onClick={() => setOpen(null)}>
-          <CAImage src={openPhoto.src} />
+        <div className={`viewer ${grain ? "has-grain" : ""}`} role="dialog" aria-modal="true" aria-label="Foto" onClick={() => setOpen(null)}>
+          <ViewerImage key={open} photo={openPhoto} />
           <div className="viewer-id" key={open}>
             <span className="viewer-code">{rgCode(open!)}</span>
             <span>

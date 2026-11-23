@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { commitTunel, readTunelPhotos } from "@/lib/github-content";
-import { isTunelPhoto, sortTunelPhotos, TUNEL_UPLOAD_DIR, type TunelPhoto } from "@/lib/tunel";
+import { commitTunel, readTunelPhotos, readTunelSettings } from "@/lib/github-content";
+import { isTunelPhoto, normalizeTunelSettings, sortTunelPhotos, TUNEL_UPLOAD_DIR, type TunelPhoto } from "@/lib/tunel";
 
 async function requireAdmin() {
   const session = await auth();
@@ -13,10 +13,11 @@ async function requireAdmin() {
 export async function GET() {
   const session = await requireAdmin();
   if (!session) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  return NextResponse.json({ photos: await readTunelPhotos() });
+  const [photos, settings] = await Promise.all([readTunelPhotos(), readTunelSettings()]);
+  return NextResponse.json({ photos, settings });
 }
 
-type Added = { id: string; ext: string; blobSha: string };
+type Added = { id: string; ext: string; blobSha: string; fullBlobSha: string };
 
 /**
  * Saves the whole list in one commit. Body:
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
   const session = await requireAdmin();
   if (!session) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const body = (await req.json()) as { photos?: unknown; added?: unknown };
+  const body = (await req.json()) as { photos?: unknown; added?: unknown; settings?: unknown };
   if (!Array.isArray(body.photos) || !Array.isArray(body.added)) {
     return NextResponse.json({ error: "photos y added son requeridos" }, { status: 400 });
   }
@@ -41,7 +42,9 @@ export async function POST(req: NextRequest) {
       !/^[a-z0-9-]{4,40}$/.test(a.id) ||
       !/^(jpg|png|webp|gif)$/.test(a.ext) ||
       typeof a.blobSha !== "string" ||
-      !/^[0-9a-f]{40}$/.test(a.blobSha)
+      !/^[0-9a-f]{40}$/.test(a.blobSha) ||
+      typeof a.fullBlobSha !== "string" ||
+      !/^[0-9a-f]{40}$/.test(a.fullBlobSha)
     ) {
       return NextResponse.json({ error: "Foto nueva inválida" }, { status: 400 });
     }
@@ -62,27 +65,36 @@ export async function POST(req: NextRequest) {
     seen.add(candidate.id);
     const existing = oldById.get(candidate.id);
     if (existing) {
-      next.push({ id: existing.id, src: existing.src, year: candidate.year });
+      next.push({ ...existing, year: candidate.year });
       continue;
     }
     const a = added.get(candidate.id);
     if (!a) return NextResponse.json({ error: `Falta la imagen de ${candidate.id}` }, { status: 400 });
-    const rel = `${candidate.year ?? "sin-ano"}/${a.id}.${a.ext}`;
+    // Light version for the tunnel + original quality for the viewer.
+    const dir = `${candidate.year ?? "sin-ano"}`;
+    const rel = `${dir}/${a.id}.${a.ext}`;
+    const relFull = `${dir}/${a.id}-full.${a.ext}`;
     files.push({ path: `${TUNEL_UPLOAD_DIR}/${rel}`, blobSha: a.blobSha });
-    next.push({ id: a.id, src: `/uploads/tunel/${rel}`, year: candidate.year });
+    files.push({ path: `${TUNEL_UPLOAD_DIR}/${relFull}`, blobSha: a.fullBlobSha });
+    next.push({ id: a.id, src: `/uploads/tunel/${rel}`, full: `/uploads/tunel/${relFull}`, year: candidate.year });
   }
 
   const removed = old
-    .filter((p) => !seen.has(p.id) && p.src.startsWith("/uploads/tunel/"))
-    .map((p) => `public${p.src}`);
+    .filter((p) => !seen.has(p.id))
+    .flatMap((p) => [p.src, p.full])
+    .filter((src): src is string => !!src && src.startsWith("/uploads/tunel/"))
+    .map((src) => `public${src}`);
 
   const parts = [
-    files.length && `+${files.length}`,
+    files.length && `+${files.length / 2}`,
     removed.length && `-${removed.length}`,
   ].filter(Boolean);
   const message = `admin: update tunel photos${parts.length ? ` (${parts.join(" ")})` : ""}`;
 
+  // Settings: what the admin sent, or the current ones if it sent none.
+  const settings = body.settings === undefined ? await readTunelSettings() : normalizeTunelSettings(body.settings);
+
   const sorted = sortTunelPhotos(next);
-  const sha = await commitTunel(sorted, files, removed, message);
-  return NextResponse.json({ ok: true, commit: sha, photos: sorted });
+  const sha = await commitTunel(sorted, settings, files, removed, message);
+  return NextResponse.json({ ok: true, commit: sha, photos: sorted, settings });
 }

@@ -1,4 +1,5 @@
 import tunelData from "@/data/tunel.json";
+import tunelSettings from "@/data/tunel-settings.json";
 
 /**
  * Photos of the /tunel archive. Sourced from data/tunel.json, which the
@@ -8,10 +9,32 @@ import tunelData from "@/data/tunel.json";
 export interface TunelPhoto {
   /** Stable id, also the file name of the image. */
   id: string;
-  /** Public path, e.g. "/uploads/tunel/2024/m3k9x2.jpg". */
+  /** Light version shown in the tunnel, e.g. "/uploads/tunel/2024/m3k9x2.jpg". */
   src: string;
+  /** Original quality, shown when the photo is opened. Falls back to src. */
+  full?: string;
   /** Year section of the tunnel, or null for photos without a year. */
   year: number | null;
+}
+
+/** Tunnel options edited in the CONFIGURACIÓN section of /tunel/admin (data/tunel-settings.json). */
+export interface TunelSettings {
+  /** Instagram-like film grain over the opened photo. */
+  viewerGrain: boolean;
+}
+
+export const DEFAULT_TUNEL_SETTINGS: TunelSettings = { viewerGrain: true };
+
+/** Keeps only known keys with the right type; anything else falls back to the default. */
+export function normalizeTunelSettings(v: unknown): TunelSettings {
+  const o = (v && typeof v === "object" ? v : {}) as Record<string, unknown>;
+  return {
+    viewerGrain: typeof o.viewerGrain === "boolean" ? o.viewerGrain : DEFAULT_TUNEL_SETTINGS.viewerGrain,
+  };
+}
+
+export function getTunelSettings(): TunelSettings {
+  return normalizeTunelSettings(tunelSettings);
 }
 
 /** Where uploaded tunnel images are stored inside the repo. */
@@ -25,6 +48,7 @@ export function isTunelPhoto(v: unknown): v is TunelPhoto {
     typeof p.id === "string" &&
     /^[a-z0-9-]{4,40}$/.test(p.id) &&
     typeof p.src === "string" &&
+    (p.full === undefined || typeof p.full === "string") &&
     (p.year === null || (typeof p.year === "number" && Number.isInteger(p.year) && p.year >= 1900 && p.year <= 2100))
   );
 }

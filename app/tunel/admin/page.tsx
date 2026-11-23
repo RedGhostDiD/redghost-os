@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/auth";
-import { readTunelPhotos } from "@/lib/github-content";
+import { readTunelPhotos, readTunelSettings } from "@/lib/github-content";
 import TunelAdmin from "./TunelAdmin";
 
 export const metadata: Metadata = { title: "ADMIN // TÚNEL" };
@@ -12,7 +12,7 @@ export default async function TunelAdminPage() {
   const session = await auth();
   if (session?.user?.login !== process.env.ADMIN_GITHUB_LOGIN) redirect("/admin/login?from=tunel");
 
-  const photos = await readTunelPhotos();
+  const [photos, settings] = await Promise.all([readTunelPhotos(), readTunelSettings()]);
   const owner = process.env.GITHUB_REPO_OWNER;
   const repo = process.env.GITHUB_REPO_NAME;
   const branch = process.env.GITHUB_BRANCH || "main";
@@ -76,7 +76,7 @@ export default async function TunelAdminPage() {
           )}
         </div>
 
-        <TunelAdmin initial={photos} />
+        <TunelAdmin initial={photos} initialSettings={settings} />
       </div>
     </div>
   );

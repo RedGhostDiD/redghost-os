@@ -461,6 +461,22 @@
   max-width: calc(100vw - 32px);
   max-height: calc(100vh - 96px);
 }
+/* Opened photo: in its real colours. The tunnel stays black and white. */
+.tunnel .viewer .ca img { filter: none; }
+/* Instagram-like "Grain": static film grain over the photo only (not the black around it).
+   Switched on/off from /tunel/admin → CONFIGURACIÓN. */
+.tunnel .viewer.has-grain .ca::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-image: var(--grain);
+  background-size: 160px 160px;
+  mix-blend-mode: overlay;
+  opacity: 0.6;
+}
+.tunnel .viewer.has-grain .ca img { filter: contrast(1.06) saturate(0.92); }
 /* The photo's identifier, typed in when it opens. */
 .tunnel .viewer-id {
   position: absolute;

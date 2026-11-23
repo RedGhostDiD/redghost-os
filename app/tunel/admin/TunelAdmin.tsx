@@ -1,26 +1,32 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { sortTunelPhotos, type TunelPhoto } from "@/lib/tunel";
+import { sortTunelPhotos, type TunelPhoto, type TunelSettings } from "@/lib/tunel";
 
-/** A photo in the editor; new ones carry the git blob made on upload. */
-type Item = TunelPhoto & { pending?: { ext: string; blobSha: string } };
+/** A photo in the editor; new ones carry the git blobs made on upload. */
+type Item = TunelPhoto & { pending?: { ext: string; blobSha: string; fullBlobSha: string } };
 type Upload = { key: string; name: string; status: "subiendo" | "error"; error?: string };
 
 const NOW = new Date().getFullYear();
 const YEARS = Array.from({ length: NOW + 2 - 2010 }, (_, i) => NOW + 1 - i);
-/** Long edge of uploaded photos. Keeps each upload small (Vercel body limit) and the tunnel fast. */
-const MAX_SIDE = 2400;
-const JPEG_QUALITY = 0.86;
+/** Light version: what the tunnel and the INDEX load. Small so the site stays fast. */
+const LIGHT_SIDE = 1000;
+const LIGHT_QUALITY = 0.72;
+/** Original version: shown when a photo is opened. As big as one upload allows (Vercel body limit). */
+const FULL_SIDE = 4096;
+const FULL_MAX_BYTES = 3_000_000;
 
 const rgCode = (i: number) => `RG-${String(i + 1).padStart(4, "0")}`;
 const newId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 const yearValue = (v: string) => (v === "" ? null : Number(v));
 
-/** Resizes in the browser and re-encodes as JPEG; returns base64 without the data: prefix. */
-async function prepareImage(file: File): Promise<{ base64: string; ext: string; preview: string }> {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height));
+/**
+ * Redraws the photo on a canvas and encodes a new JPEG. The new file carries
+ * none of the original metadata (GPS location, camera, date): only pixels.
+ * The EXIF rotation is applied to the pixels first, so nothing ends up sideways.
+ */
+async function encodeJpeg(bitmap: ImageBitmap, maxSide: number, quality: number): Promise<Blob> {
+  const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(bitmap.width * scale);
   canvas.height = Math.round(bitmap.height * scale);
@@ -29,21 +35,53 @@ async function prepareImage(file: File): Promise<{ base64: string; ext: string; 
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-  const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/jpeg", JPEG_QUALITY));
+  const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/jpeg", quality));
   if (!blob) throw new Error("No se pudo comprimir la imagen");
-  const dataUrl = await new Promise<string>((resolve, reject) => {
+  return blob;
+}
+
+/** Highest quality that still fits in one upload: lowers quality, then size, until it fits. */
+async function encodeFull(bitmap: ImageBitmap): Promise<Blob> {
+  let side = Math.min(FULL_SIDE, Math.max(bitmap.width, bitmap.height));
+  for (;;) {
+    for (const q of [0.92, 0.88, 0.84]) {
+      const blob = await encodeJpeg(bitmap, side, q);
+      if (blob.size <= FULL_MAX_BYTES) return blob;
+    }
+    side = Math.round(side * 0.85);
+  }
+}
+
+const toBase64 = (blob: Blob) =>
+  new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
+    reader.onload = () => resolve((reader.result as string).split(",")[1]);
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(blob);
   });
-  return { base64: dataUrl.split(",")[1], ext: "jpg", preview: URL.createObjectURL(blob) };
+
+async function uploadBlob(blob: Blob): Promise<string> {
+  const res = await fetch("/api/admin/tunel/blob", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ contentBase64: await toBase64(blob) }),
+  });
+  const data = (await res.json().catch(() => ({}))) as { blobSha?: string; error?: string };
+  if (!res.ok || !data.blobSha) throw new Error(data.error || `Error ${res.status}`);
+  return data.blobSha;
 }
 
-export default function TunelAdmin({ initial }: { initial: TunelPhoto[] }) {
+export default function TunelAdmin({
+  initial,
+  initialSettings,
+}: {
+  initial: TunelPhoto[];
+  initialSettings: TunelSettings;
+}) {
   const [items, setItems] = useState<Item[]>(initial);
   const [saved, setSaved] = useState<TunelPhoto[]>(initial);
+  const [settings, setSettings] = useState<TunelSettings>(initialSettings);
+  const [savedSettings, setSavedSettings] = useState<TunelSettings>(initialSettings);
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [uploadYear, setUploadYear] = useState<string>(String(NOW));
   const [saving, setSaving] = useState(false);
@@ -57,8 +95,9 @@ export default function TunelAdmin({ initial }: { initial: TunelPhoto[] }) {
   const dirty = useMemo(
     () =>
       JSON.stringify(ordered.map(({ id, year }) => [id, year])) !==
-      JSON.stringify(sortTunelPhotos(saved).map(({ id, year }) => [id, year])),
-    [ordered, saved]
+        JSON.stringify(sortTunelPhotos(saved).map(({ id, year }) => [id, year])) ||
+      JSON.stringify(settings) !== JSON.stringify(savedSettings),
+    [ordered, saved, settings, savedSettings]
   );
   const busy = uploads.some((u) => u.status === "subiendo");
 
@@ -80,19 +119,18 @@ export default function TunelAdmin({ initial }: { initial: TunelPhoto[] }) {
       const key = newId();
       setUploads((u) => [...u, { key, name: file.name, status: "subiendo" }]);
       try {
-        const img = await prepareImage(file);
-        const res = await fetch("/api/admin/tunel/blob", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contentBase64: img.base64 }),
-        });
-        const data = (await res.json().catch(() => ({}))) as { blobSha?: string; ext?: string; error?: string };
-        if (!res.ok || !data.blobSha) throw new Error(data.error || `Error ${res.status}`);
-        previews.current.set(key, img.preview);
-        setItems((list) => [
-          ...list,
-          { id: key, src: img.preview, year, pending: { ext: data.ext || img.ext, blobSha: data.blobSha! } },
-        ]);
+        const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+        let light: Blob, full: Blob;
+        try {
+          light = await encodeJpeg(bitmap, LIGHT_SIDE, LIGHT_QUALITY);
+          full = await encodeFull(bitmap);
+        } finally {
+          bitmap.close();
+        }
+        const [blobSha, fullBlobSha] = await Promise.all([uploadBlob(light), uploadBlob(full)]);
+        const preview = URL.createObjectURL(light);
+        previews.current.set(key, preview);
+        setItems((list) => [...list, { id: key, src: preview, year, pending: { ext: "jpg", blobSha, fullBlobSha } }]);
         setUploads((u) => u.filter((x) => x.key !== key));
       } catch (err) {
         const text = err instanceof Error ? err.message : "Error al subir";
@@ -105,7 +143,8 @@ export default function TunelAdmin({ initial }: { initial: TunelPhoto[] }) {
     setItems((list) => list.map((p) => (p.id === id ? { ...p, year } : p)));
   }
 
-  function remove(id: string) {
+  function remove(id: string, code: string) {
+    if (!confirm(`¿Borrar ${code}? Al publicar, la foto se elimina del túnel y de GitHub.`)) return;
     setItems((list) => list.filter((p) => p.id !== id));
   }
 
@@ -124,6 +163,7 @@ export default function TunelAdmin({ initial }: { initial: TunelPhoto[] }) {
   function discard() {
     if (!confirm("¿Descartar los cambios sin publicar?")) return;
     setItems(saved);
+    setSettings(savedSettings);
     setMessage(null);
   }
 
@@ -137,13 +177,22 @@ export default function TunelAdmin({ initial }: { initial: TunelPhoto[] }) {
         body: JSON.stringify({
           photos: ordered.map(({ id, year }) => ({ id, year })),
           added: ordered.filter((p) => p.pending).map((p) => ({ id: p.id, ...p.pending })),
+          settings,
         }),
       });
-      const data = (await res.json().catch(() => ({}))) as { photos?: TunelPhoto[]; error?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        photos?: TunelPhoto[];
+        settings?: TunelSettings;
+        error?: string;
+      };
       if (!res.ok || !data.photos) throw new Error(data.error || `Error ${res.status}`);
       // New files are not deployed yet: keep showing their local previews.
       const withPreviews = data.photos.map((p) => ({ ...p, src: previews.current.get(p.id) ?? p.src }));
       setSaved(data.photos);
+      if (data.settings) {
+        setSettings(data.settings);
+        setSavedSettings(data.settings);
+      }
       setItems(withPreviews);
       setMessage({
         kind: "ok",
@@ -219,7 +268,7 @@ export default function TunelAdmin({ initial }: { initial: TunelPhoto[] }) {
             + ELEGIR FOTOS
           </button>
           <span className="text-[10px]" style={{ color: "var(--rg-text-faint)" }}>
-            o arrástralas aquí. Se reducen a {MAX_SIDE}px y el túnel las muestra en B/N.
+            o arrástralas aquí. El túnel usa una versión ligera; al abrir la foto se ve la original. Se borran los metadatos (ubicación incluida).
           </span>
           <input
             ref={fileInput}
@@ -252,6 +301,27 @@ export default function TunelAdmin({ initial }: { initial: TunelPhoto[] }) {
             ))}
           </ul>
         )}
+      </section>
+
+      {/* Settings */}
+      <section className="border p-4 flex flex-col gap-3" style={{ ...line, background: "var(--rg-panel)" }}>
+        <h2 className="text-xs tracking-[0.2em]" style={{ color: "var(--rg-text-dim)" }}>
+          CONFIGURACIÓN
+        </h2>
+        <label className="flex items-start gap-3 text-xs cursor-pointer">
+          <input
+            type="checkbox"
+            checked={settings.viewerGrain}
+            onChange={(e) => setSettings((st) => ({ ...st, viewerGrain: e.target.checked }))}
+            className="mt-0.5 accent-[var(--rg-red)]"
+          />
+          <span>
+            <span style={{ color: "var(--rg-text)" }}>Grano en la foto abierta</span>
+            <span className="block text-[10px] mt-0.5" style={{ color: "var(--rg-text-faint)" }}>
+              Filtro de grano tipo Instagram al hacer clic en una foto. El túnel no cambia.
+            </span>
+          </span>
+        </label>
       </section>
 
       {/* Publish bar */}
@@ -355,7 +425,7 @@ export default function TunelAdmin({ initial }: { initial: TunelPhoto[] }) {
                   </button>
                   <button
                     type="button"
-                    onClick={() => remove(photo.id)}
+                    onClick={() => remove(photo.id, rgCode(index))}
                     className={`${btn} ml-auto`}
                     style={{ ...line, color: "var(--rg-red-soft)" }}
                   >

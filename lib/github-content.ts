@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/rest";
 import type { Project } from "@/lib/projects";
 import type { SiteConfig } from "@/lib/site-config";
 import type { WallPost } from "@/lib/wall";
-import { isTunelPhoto, type TunelPhoto } from "@/lib/tunel";
+import { isTunelPhoto, normalizeTunelSettings, type TunelPhoto, type TunelSettings } from "@/lib/tunel";
 
 const PROJECTS_PATH = "data/projects.json";
 const SITE_CONFIG_PATH = "data/site-config.json";
@@ -116,6 +116,13 @@ export async function uploadPublicFile(
 // ---------- /tunel photo archive ----------
 
 const TUNEL_PATH = "data/tunel.json";
+const TUNEL_SETTINGS_PATH = "data/tunel-settings.json";
+
+export async function readTunelSettings(): Promise<TunelSettings> {
+  const file = await getFile(TUNEL_SETTINGS_PATH);
+  if (!file) return normalizeTunelSettings(null);
+  return normalizeTunelSettings(JSON.parse(Buffer.from(file.contentBase64, "base64").toString("utf-8")));
+}
 
 export async function readTunelPhotos(): Promise<TunelPhoto[]> {
   const file = await getFile(TUNEL_PATH);
@@ -137,11 +144,12 @@ export async function createImageBlob(contentBase64: string): Promise<string> {
 }
 
 /**
- * Writes data/tunel.json, adds the new image blobs and deletes the images of
+ * Writes data/tunel.json and data/tunel-settings.json, adds the new image blobs and deletes the images of
  * removed photos, all in one commit on the configured branch.
  */
 export async function commitTunel(
   photos: TunelPhoto[],
+  settings: TunelSettings,
   added: { path: string; blobSha: string }[],
   removedPaths: string[],
   message: string
@@ -158,6 +166,7 @@ export async function commitTunel(
     base_tree: head.data.tree.sha,
     tree: [
       { path: TUNEL_PATH, mode: "100644", type: "blob", content: json },
+      { path: TUNEL_SETTINGS_PATH, mode: "100644", type: "blob", content: JSON.stringify(settings, null, 2) + "\n" },
       ...added.map((a) => ({ path: a.path, mode: "100644" as const, type: "blob" as const, sha: a.blobSha })),
       ...removedPaths.map((p) => ({ path: p, mode: "100644" as const, type: "blob" as const, sha: null })),
     ],

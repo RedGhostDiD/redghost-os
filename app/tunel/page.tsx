@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Tunnel from "@/components/tunel/Tunnel";
-import { getTunelPhotos } from "@/lib/tunel";
+import { getTunelPhotos, getTunelSettings } from "@/lib/tunel";
 import "./tunel.css";
 
 export const metadata: Metadata = {
@@ -11,6 +11,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: "#000000" };
 
 export default function TunelPage() {
-  const photos = getTunelPhotos().map(({ src, year }) => ({ src, year }));
-  return <Tunnel photos={photos} />;
+  const photos = getTunelPhotos().map(({ src, full, year }) => ({ src, full, year }));
+  return <Tunnel photos={photos} grain={getTunelSettings().viewerGrain} />;
 }
