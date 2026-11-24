@@ -1,0 +1,125 @@
+{
+  "whatsappMessage": "Hi RedGhost, I saw your portfolio and I'd like a quote for a website.",
+  "mxnPerUsd": 18.5,
+  "projects": {
+    "did-shop": {
+      "kind": "Online store",
+      "summary": "Electronic components store in Mexico: catalog with datasheets, search, cart and two admin panels, one for the owner and one for the warehouse staff.",
+      "status": "Live"
+    },
+    "redghost-os": {
+      "kind": "Brand site",
+      "summary": "The RedGhost brand site, with an operating-system interface: project modules, a post wall, a store and a mini game. Everything is edited from its own panel.",
+      "status": "Live"
+    },
+    "tunel": {
+      "kind": "Photo gallery",
+      "summary": "A photo archive you travel through like a tunnel, sorted by year and date. Photos are uploaded as camera RAW files and developed right in the browser, no external software.",
+      "status": "Live"
+    },
+    "monster-burger": {
+      "kind": "Landing page",
+      "summary": "Demo page for a burger joint: a loading screen where the monster eats the bar, scroll animations, a menu with combos and WhatsApp orders with the message already written.",
+      "status": "Live"
+    }
+  },
+  "packages": [
+    {
+      "name": "Landing page",
+      "for": "To present a product, service or event on a single page.",
+      "features": [
+        "One scrolling page, up to 6 content blocks",
+        "WhatsApp button or contact form",
+        "Works on phone, tablet and desktop",
+        "Basic SEO setup to help search engines index it",
+        "Two rounds of revisions"
+      ],
+      "delivery": "1 to 2 weeks"
+    },
+    {
+      "name": "Business website",
+      "for": "For businesses that need several sections and to update their content.",
+      "features": [
+        "Up to 5 pages or sections (home, services, gallery, contact…)",
+        "Panel to edit texts and images, with features defined in the quote",
+        "Google Maps location",
+        "Domain and hosting setup",
+        "Two rounds of revisions"
+      ],
+      "delivery": "2 to 4 weeks"
+    },
+    {
+      "name": "Online store",
+      "for": "To sell online with a catalog, cart and inventory control.",
+      "features": [
+        "Starting catalog of up to 30 products",
+        "Categories and search",
+        "Cart and one payment gateway integration",
+        "Panel for products, prices and basic inventory",
+        "Team accounts with one permission scheme"
+      ],
+      "delivery": "4 to 8 weeks"
+    }
+  ],
+  "pricingNotes": [
+    "Published prices are starting rates for projects with standard requirements. The final cost depends on the features, integrations and scope of the project.",
+    "Domain, hosting, third-party services and payment fees may add costs. They are specified before the project starts.",
+    "Changes outside the agreed scope are quoted separately.",
+    "USD amounts are approximate; quotes and payments are in Mexican pesos (MXN)."
+  ],
+  "steps": [
+    {
+      "title": "Quote",
+      "text": "We go over your idea, your needs and the features it will have. You get scope, timeline and price in writing."
+    },
+    {
+      "title": "Deposit",
+      "text": "Once the quote is approved, 50% is paid and development starts. Timelines run from when I receive the deposit and all your material."
+    },
+    {
+      "title": "Build and review",
+      "text": "You see real progress on a preview link and we make the agreed adjustments."
+    },
+    {
+      "title": "Delivery",
+      "text": "The remaining 50% is paid and I publish the site on your domain. I show you how to edit your content."
+    }
+  ],
+  "support": [
+    {
+      "title": "Technical guarantee",
+      "tag": "30 days included",
+      "text": "If something I built fails because of my mistake, I fix it at no cost.",
+      "items": [
+        "Buttons or links that stopped working because of a development error",
+        "Forms that don't send the information",
+        "Display errors on supported devices",
+        "Delivered features that don't work as agreed"
+      ]
+    },
+    {
+      "title": "Maintenance",
+      "tag": "Optional service",
+      "text": "For changes, improvements and support after the guarantee. Not mandatory.",
+      "items": [
+        "Content updates",
+        "Design changes",
+        "New features",
+        "Technical updates and reviews"
+      ]
+    },
+    {
+      "title": "Renewals",
+      "tag": "Recurring cost",
+      "text": "External services that keep your site online, each with its own terms and prices.",
+      "items": [
+        "Domain",
+        "Hosting",
+        "Third-party services",
+        "Payment tools, when they apply"
+      ]
+    }
+  ],
+  "supportNote": "The guarantee covers errors in the delivered work, not new features, requested changes, or failures of external services or third-party interventions. A programming error of mine gets fixed even after the 30 days.",
+  "ownership": "The domain and key accounts stay in your name, even if I set them up. You get the agreed access and know your renewal dates: your site doesn't depend on me."
+}

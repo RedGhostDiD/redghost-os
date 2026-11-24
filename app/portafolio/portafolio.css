@@ -535,3 +535,26 @@
   color: var(--pf-dim-d);
   line-height: 1.3;
 }
+
+/* ---------- language switch (ES / EN) ----------
+   Both languages are in the HTML; data-lang on .pf picks which one shows. */
+.pf:not([data-lang="en"]) [data-l="en"],
+.pf[data-lang="en"] [data-l="es"] { display: none !important; }
+
+.pf-lang { display: inline-flex; align-items: center; gap: 6px; }
+.pf-lang button {
+  font: inherit;
+  letter-spacing: inherit;
+  color: var(--pf-dim-d);
+  background: none;
+  border: 0;
+  padding: 2px 0;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.pf-lang button:hover { color: var(--pf-cream); }
+.pf-lang button[aria-pressed="true"] { color: var(--pf-red); }
+.pf-lang button:focus-visible { outline: 1.5px solid var(--pf-red); outline-offset: 3px; }
+.pf-lang > span { color: var(--pf-faint-d); }
+.pf-hero-top-right { display: flex; align-items: flex-start; gap: 18px; }
+.pf-usd { display: block; margin-top: 8px; color: var(--pf-dim-d); }

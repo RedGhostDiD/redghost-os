@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter_Tight } from "next/font/google";
+import { LANG_BOOT_SCRIPT } from "@/components/portafolio/Lang";
 import "./portafolio.css";
 
 const sans = Inter_Tight({
@@ -24,5 +25,11 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: "#050509" };
 
 export default function PortafolioLayout({ children }: { children: React.ReactNode }) {
-  return <div className={`pf ${sans.variable}`}>{children}</div>;
+  // The boot script may set data-lang/lang before hydration, hence suppressHydrationWarning.
+  return (
+    <div className={`pf ${sans.variable}`} lang="es" suppressHydrationWarning>
+      <script dangerouslySetInnerHTML={{ __html: LANG_BOOT_SCRIPT }} />
+      {children}
+    </div>
+  );
 }
