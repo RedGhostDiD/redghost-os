@@ -61,6 +61,26 @@
       "url": "/tunel",
       "status": "En línea",
       "image": "/portafolio/tunel.png"
+    },
+    {
+      "slug": "monster-burger",
+      "name": "Monster Burger",
+      "kind": "Landing page",
+      "summary": "Demo de una página para una hamburguesería: pantalla de carga con el monstruo comiéndose la barra, animaciones al hacer scroll, menú con combos y pedidos por WhatsApp con el mensaje ya escrito.",
+      "highlights": [
+        "Una sola página con 6 bloques y transiciones de olas",
+        "Botones de pedido que abren WhatsApp con el producto elegido",
+        "Se adapta a celular, tablet y computadora, con SEO básico"
+      ],
+      "stack": [
+        "Next.js",
+        "React 19",
+        "CSS animado"
+      ],
+      "url": "/portafolio/hamburguesas-landingpage",
+      "status": "En línea",
+      "demo": true,
+      "image": "/portafolio/monster-burger.png"
     }
   ],
   "packages": [

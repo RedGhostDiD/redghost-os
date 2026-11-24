@@ -4,6 +4,7 @@ import { PORTFOLIO, formatPrice, whatsappLink } from "@/lib/portafolio";
 import { SITE_CONFIG } from "@/lib/site-config";
 import { getTunelPhotos } from "@/lib/tunel";
 import BarsReveal from "@/components/portafolio/BarsReveal";
+import Flicker from "@/components/portafolio/Flicker";
 import LocalClock from "@/components/portafolio/LocalClock";
 import {
   ArrowRight,
@@ -37,7 +38,7 @@ export default function PortafolioPage() {
       {/* ================= HERO ================= */}
       <section className="pf-hero">
         <div className="pf-hero-top">
-          <p className="pf-mono"><span className="pf-sq" /> PORTAFOLIO — 2026</p>
+          <p className="pf-mono"><span className="pf-sq" /> <Flicker text="PORTAFOLIO — 2026" seed={1} /></p>
           <Corner corner="tr" className="pf-dim" />
         </div>
 
@@ -45,7 +46,7 @@ export default function PortafolioPage() {
           <div className="pf-rail" />
           <h1 className="pf-wordmark">
             <span className="sr-only">RedGhost</span>
-            <span aria-hidden="true">RΞD GHØST</span>
+            <span aria-hidden="true"><Flicker text="RΞD GHØST" seed={2} pick={[1, 4, 7]} /></span>
             <GhostMark className="pf-wordmark-ghost" eyes="var(--pf-ink)" />
           </h1>
         </div>
@@ -53,13 +54,12 @@ export default function PortafolioPage() {
         <div className="pf-row pf-hero-info">
           <div className="pf-rail">
             <Corner corner="tl" className="pf-dim" />
-            <p className="pf-mono">DESARROLLADOR WEB<br />INDEPENDIENTE EN MÉXICO.</p>
+            <p className="pf-mono"><Flicker text="DESARROLLADOR WEB" seed={3} /><br /><Flicker text="INDEPENDIENTE EN MÉXICO." seed={4} /></p>
           </div>
           <div className="pf-hero-copy">
-            <p className="pf-name">RΞD GHØST studio</p>
+            <p className="pf-name"><Flicker text="RΞD GHØST studio" seed={5} /></p>
             <p className="pf-mono">
-              DISEÑO Y PROGRAMO PÁGINAS WEB, TIENDAS EN LÍNEA Y PANELES A LA MEDIDA
-              PARA NEGOCIOS QUE QUIEREN VERSE EN SERIO.
+              <Flicker text="DISEÑO Y PROGRAMO PÁGINAS WEB, TIENDAS EN LÍNEA Y PANELES A LA MEDIDA PARA NEGOCIOS QUE QUIEREN VERSE EN SERIO." seed={6} every={6} />
             </p>
             <div className="pf-hairline"><PlusThin size={22} /></div>
           </div>
@@ -68,10 +68,10 @@ export default function PortafolioPage() {
         <nav className="pf-hero-nav pf-mono" aria-label="Secciones">
           <span className="pf-mini-ghost"><GhostMark /></span>
           <span className="pf-hero-links">
-            <a href="#trabajos">TRABAJOS</a>, <a href="#paquetes">PAQUETES</a>, <a href="#garantia">GARANTÍA</a>, <a href="#ethos">ETHOS</a>
+            <a href="#trabajos"><Flicker text="TRABAJOS" seed={7} /></a>, <a href="#paquetes"><Flicker text="PAQUETES" seed={8} /></a>, <a href="#garantia"><Flicker text="GARANTÍA" seed={9} /></a>, <a href="#ethos"><Flicker text="ETHOS" seed={10} /></a>
           </span>
           <span className="pf-hero-clock"><LocalClock /> <span className="pf-dim">{"//"}</span></span>
-          <a href="#contacto" className="pf-hero-contact">CONTACTO</a>
+          <a href="#contacto" className="pf-hero-contact"><Flicker text="CONTACTO" seed={11} /></a>
         </nav>
       </section>
 
@@ -101,6 +101,7 @@ export default function PortafolioPage() {
                 <p className="pf-mono pf-dim pf-work-sum">{p.summary}</p>
                 <p className="pf-mono pf-work-kind">
                   {p.kind.toUpperCase()} <span className={live ? "pf-live" : "pf-dim"}>· {p.status.toUpperCase()}</span>
+                  {p.demo && <span className="pf-demo">DEMO</span>}
                 </p>
                 {live ? (
                   <a

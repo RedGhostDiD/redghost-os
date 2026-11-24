@@ -9,6 +9,8 @@ export interface PortfolioProject {
   stack: string[];
   url: string;
   status: string;
+  /** Concept project, not a real client: shows a DEMO tag next to the status. */
+  demo?: boolean;
   image: string;
 }
 

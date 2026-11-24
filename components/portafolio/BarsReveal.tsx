@@ -26,6 +26,8 @@ const BARS = Array.from({ length: COLS * ROWS }, (_, i) => {
  * Sticky reveal: the stage (the cream contact card) stays pinned while a grid
  * of black bars covering it thins out and disappears as the visitor scrolls.
  * When every bar is gone the stage unpins and the page scrolls on normally.
+ *
+ * Links to #contacto land at the end of the run, with the card fully open.
  */
 export default function BarsReveal({ children }: { children: React.ReactNode }) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -41,6 +43,10 @@ export default function BarsReveal({ children }: { children: React.ReactNode }) 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     let frame = 0;
 
+    /** Scroll position where the bars are all gone and the card is complete. */
+    const endOfRun = () =>
+      section.getBoundingClientRect().top + window.scrollY + (section.offsetHeight - stage.offsetHeight);
+
     const layout = () => {
       // Scroll distance = stage height + 1.4 screens of "pinned" scrolling.
       const run = reduced.matches ? 0 : window.innerHeight * 1.4;
@@ -49,14 +55,22 @@ export default function BarsReveal({ children }: { children: React.ReactNode }) 
 
     const update = () => {
       frame = 0;
-      if (reduced.matches) {
-        bars.style.setProperty("--p", "1");
-        return;
+      let p = 1;
+      if (!reduced.matches) {
+        const rect = section.getBoundingClientRect();
+        const run = rect.height - stage.offsetHeight;
+        p = run > 0 ? Math.min(1, Math.max(0, -rect.top / run)) : 1;
       }
-      const rect = section.getBoundingClientRect();
-      const run = rect.height - stage.offsetHeight;
-      const p = run > 0 ? Math.min(1, Math.max(0, -rect.top / run)) : 1;
       bars.style.setProperty("--p", p.toFixed(4));
+    };
+
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const link = (e.target as Element | null)?.closest?.('a[href="#contacto"]');
+      if (!link) return;
+      e.preventDefault();
+      history.replaceState(null, "", "#contacto");
+      window.scrollTo({ top: endOfRun(), behavior: reduced.matches ? "auto" : "smooth" });
     };
 
     const onScroll = () => {
@@ -69,6 +83,8 @@ export default function BarsReveal({ children }: { children: React.ReactNode }) 
 
     onResize();
     bars.dataset.ready = "1";
+    if (location.hash === "#contacto") window.scrollTo({ top: endOfRun(), behavior: "auto" });
+    document.addEventListener("click", onClick);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
     reduced.addEventListener("change", onResize);
@@ -77,6 +93,7 @@ export default function BarsReveal({ children }: { children: React.ReactNode }) 
 
     return () => {
       cancelAnimationFrame(frame);
+      document.removeEventListener("click", onClick);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       reduced.removeEventListener("change", onResize);
