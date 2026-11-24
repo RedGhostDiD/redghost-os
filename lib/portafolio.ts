@@ -27,11 +27,19 @@ export interface PortfolioData {
   currency: string;
   projects: PortfolioProject[];
   packages: PortfolioPackage[];
-  faq: { q: string; a: string }[];
+  /** Small print under the packages ("desde", external costs, scope). */
+  pricingNotes: string[];
+  payment: { deposit: number; guaranteeDays: number };
+  /** How a project runs, payment included. */
+  steps: { title: string; text: string }[];
+  /** Guarantee / maintenance / renewals. */
+  support: { title: string; tag: string; text: string; items: string[] }[];
+  supportNote: string;
+  ownership: string;
 }
 
 /**
- * Content of /portafolio (projects, packages, prices, FAQ, WhatsApp).
+ * Content of /portafolio (projects, packages, prices, terms, WhatsApp).
  * Edit data/portafolio.json — email and socials come from site-config.json.
  */
 export const PORTFOLIO: PortfolioData = data as PortfolioData;

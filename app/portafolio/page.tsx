@@ -22,20 +22,13 @@ import {
   TargetMark,
 } from "@/components/portafolio/Marks";
 
-const STEPS = [
-  { title: "Platicamos", text: "Me cuentas qué necesitas por WhatsApp o en llamada. Sin compromiso." },
-  { title: "Propuesta", text: "Qué incluye, en cuánto tiempo y un precio fijo, por escrito." },
-  { title: "Desarrollo", text: "Ves avances reales en una liga de prueba y pides cambios sobre la marcha." },
-  { title: "Entrega", text: "Publico el sitio en tu dominio y te enseño a editar tu contenido." },
-];
-
 function displayPhone(n: string) {
   // 523112547359 → +52 311 254 7359
   return n.length === 12 ? `+${n.slice(0, 2)} ${n.slice(2, 5)} ${n.slice(5, 8)} ${n.slice(8)}` : `+${n}`;
 }
 
 export default function PortafolioPage() {
-  const { projects, packages, currency, whatsapp } = PORTFOLIO;
+  const { projects, packages, currency, whatsapp, pricingNotes, payment, steps, support, supportNote, ownership } = PORTFOLIO;
   const wa = whatsappLink();
   const feed = getTunelPhotos().filter((p) => p.src.startsWith("/")).slice(-3).reverse();
 
@@ -75,7 +68,7 @@ export default function PortafolioPage() {
         <nav className="pf-hero-nav pf-mono" aria-label="Secciones">
           <span className="pf-mini-ghost"><GhostMark /></span>
           <span className="pf-hero-links">
-            <a href="#trabajos">TRABAJOS</a>, <a href="#paquetes">PAQUETES</a>, <a href="#ethos">ETHOS</a>
+            <a href="#trabajos">TRABAJOS</a>, <a href="#paquetes">PAQUETES</a>, <a href="#garantia">GARANTÍA</a>, <a href="#ethos">ETHOS</a>
           </span>
           <span className="pf-hero-clock"><LocalClock /> <span className="pf-dim">{"//"}</span></span>
           <a href="#contacto" className="pf-hero-contact">CONTACTO</a>
@@ -110,7 +103,14 @@ export default function PortafolioPage() {
                   {p.kind.toUpperCase()} <span className={live ? "pf-live" : "pf-dim"}>· {p.status.toUpperCase()}</span>
                 </p>
                 {live ? (
-                  <a href={p.url} className="pf-work-link" aria-label={`Abrir ${p.name}`}>{card}</a>
+                  <a
+                    href={p.url}
+                    className="pf-work-link"
+                    aria-label={`Abrir ${p.name}`}
+                    {...(p.url.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  >
+                    {card}
+                  </a>
                 ) : (
                   card
                 )}
@@ -162,6 +162,59 @@ export default function PortafolioPage() {
             </article>
           ))}
         </div>
+
+        <div className="pf-row pf-notes">
+          <div className="pf-rail" />
+          <ul className="pf-mono pf-dim">
+            {pricingNotes.map((n) => <li key={n}>{n}</li>)}
+          </ul>
+        </div>
+      </section>
+
+      {/* ================= GUARANTEE & SUPPORT ================= */}
+      <section id="garantia" className="pf-section">
+        <header className="pf-row pf-head">
+          <div className="pf-rail"><span className="pf-sq" /></div>
+          <div>
+            <h2 className="pf-h2">garantía</h2>
+            <p className="pf-tags pf-mono">
+              <TargetMark size={16} /> <PlusThin size={14} /> <SquareDot size={14} /> PAGOS / GARANTÍA / SOPORTE
+            </p>
+          </div>
+        </header>
+
+        <dl className="pf-model">
+          <div><dt className="pf-mono pf-dim">ANTICIPO</dt><dd>{payment.deposit}%</dd></div>
+          <div><dt className="pf-mono pf-dim">LIQUIDACIÓN</dt><dd>{100 - payment.deposit}%</dd></div>
+          <div><dt className="pf-mono pf-dim">DÍAS DE GARANTÍA</dt><dd className="pf-red">{payment.guaranteeDays}</dd></div>
+          <div><dt className="pf-mono pf-dim">MANTENIMIENTO COTIZABLE</dt><dd>∞</dd></div>
+        </dl>
+
+        <div className="pf-support">
+          {support.map((s, i) => (
+            <article key={s.title} className="pf-pkg">
+              <p className="pf-mono pf-pkg-top">
+                <span>{String(i + 1).padStart(2, "0")}</span>
+                <span className={i === 0 ? "pf-red" : undefined}>{s.tag.toUpperCase()}</span>
+              </p>
+              <h3 className="pf-pkg-name">{s.title}</h3>
+              <p className="pf-mono pf-dim pf-pkg-for">{s.text}</p>
+              <ul className="pf-mono pf-pkg-list">
+                {s.items.map((it) => <li key={it}>{it}</li>)}
+              </ul>
+            </article>
+          ))}
+        </div>
+
+        <div className="pf-row pf-notes">
+          <div className="pf-rail" />
+          <div>
+            <p className="pf-ownership">{ownership}</p>
+            <ul className="pf-mono pf-dim">
+              <li>{supportNote}</li>
+            </ul>
+          </div>
+        </div>
       </section>
 
       {/* ================= VISUAL FEED ================= */}
@@ -210,7 +263,7 @@ export default function PortafolioPage() {
         <div className="pf-row">
           <div className="pf-rail" />
           <ol className="pf-steps">
-            {STEPS.map((s, i) => (
+            {steps.map((s, i) => (
               <li key={s.title}>
                 <p className="pf-mono pf-red">{String(i + 1).padStart(2, "0")}</p>
                 <h3>{s.title}</h3>
@@ -245,6 +298,7 @@ export default function PortafolioPage() {
                 <p>
                   <a href="#trabajos">TRABAJOS</a>,<br />
                   <a href="#paquetes">PAQUETES</a>,<br />
+                  <a href="#garantia">GARANTÍA</a>,<br />
                   <a href="#ethos">ETHOS</a>,<br />
                   <Link href="/">REDGHOST.OS</Link>
                 </p>

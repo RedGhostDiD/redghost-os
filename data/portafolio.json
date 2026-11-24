@@ -13,9 +13,14 @@
         "Panel del dueño con GitHub y panel del personal con Google",
         "Base de datos en Supabase con roles y permisos por usuario"
       ],
-      "stack": ["Next.js", "TypeScript", "Supabase", "OAuth"],
+      "stack": [
+        "Next.js",
+        "TypeScript",
+        "Supabase",
+        "OAuth"
+      ],
       "url": "https://redghost.shop",
-      "status": "En desarrollo",
+      "status": "En línea",
       "image": "/portafolio/did-shop.png"
     },
     {
@@ -28,7 +33,12 @@
         "El contenido se guarda en GitHub: sin base de datos que mantener",
         "Animaciones, sonido y un minijuego hechos a mano"
       ],
-      "stack": ["Next.js 16", "React 19", "Auth.js", "GitHub API"],
+      "stack": [
+        "Next.js 16",
+        "React 19",
+        "Auth.js",
+        "GitHub API"
+      ],
       "url": "/",
       "status": "En línea",
       "image": "/portafolio/redghost-os.png"
@@ -43,7 +53,11 @@
         "Subida de imágenes a Vercel Blob desde el panel",
         "Orden automático por fecha de captura"
       ],
-      "stack": ["Next.js", "WebAssembly", "Vercel Blob"],
+      "stack": [
+        "Next.js",
+        "WebAssembly",
+        "Vercel Blob"
+      ],
       "url": "/tunel",
       "status": "En línea",
       "image": "/portafolio/tunel.png"
@@ -55,10 +69,11 @@
       "price": 4500,
       "for": "Para presentar un producto, servicio o evento en una sola página.",
       "features": [
-        "Una página con diseño a la medida",
-        "Botón de WhatsApp y formulario de contacto",
-        "Se ve bien en celular, tablet y computadora",
-        "SEO básico para aparecer en Google"
+        "Una página de desplazamiento vertical, hasta 6 bloques de contenido",
+        "Botón de WhatsApp o formulario de contacto",
+        "Se adapta a celular, tablet y computadora",
+        "Configuración SEO básica para facilitar la indexación en buscadores",
+        "Dos rondas de ajustes"
       ],
       "delivery": "1 a 2 semanas",
       "featured": false
@@ -68,10 +83,11 @@
       "price": 9500,
       "for": "Para negocios que necesitan varias secciones y actualizar su contenido.",
       "features": [
-        "Hasta 5 secciones (inicio, servicios, galería, contacto…)",
-        "Panel para editar textos e imágenes tú mismo",
+        "Hasta 5 páginas o secciones (inicio, servicios, galería, contacto…)",
+        "Panel para editar textos e imágenes, con funciones definidas en la cotización",
         "Ubicación en Google Maps",
-        "Dominio y hosting configurados"
+        "Configuración de dominio y hosting",
+        "Dos rondas de ajustes"
       ],
       "delivery": "2 a 4 semanas",
       "featured": true
@@ -81,31 +97,78 @@
       "price": 18000,
       "for": "Para vender en línea con catálogo, carrito y control de inventario.",
       "features": [
-        "Catálogo con categorías y buscador",
-        "Carrito y pagos en línea",
-        "Panel de productos, precios e inventario",
-        "Cuentas para tu equipo con permisos"
+        "Catálogo inicial de hasta 30 productos",
+        "Categorías y buscador",
+        "Carrito e integración de una pasarela de pago",
+        "Panel de productos, precios e inventario básico",
+        "Cuentas para tu equipo con un esquema de permisos"
       ],
       "delivery": "4 a 8 semanas",
       "featured": false
     }
   ],
-  "faq": [
+  "pricingNotes": [
+    "Los precios publicados son tarifas iniciales para proyectos con requerimientos estándar. El costo final depende de las funcionalidades, integraciones y alcance del proyecto.",
+    "Dominio, hosting, servicios de terceros y comisiones de pago pueden generar costos adicionales. Se especifican antes de iniciar el proyecto.",
+    "Los cambios fuera del alcance acordado se cotizan por separado."
+  ],
+  "payment": {
+    "deposit": 50,
+    "guaranteeDays": 30
+  },
+  "steps": [
     {
-      "q": "¿Necesito tener dominio y hosting?",
-      "a": "No. Te ayudo a elegir y comprar el dominio a tu nombre, y el sitio se publica en Vercel. Para la mayoría de los negocios el hosting es gratuito."
+      "title": "Cotización",
+      "text": "Revisamos tu idea, tus necesidades y las funciones que llevará. Recibes alcance, tiempos y precio por escrito."
     },
     {
-      "q": "¿Voy a poder cambiar los textos y fotos yo mismo?",
-      "a": "Sí, en los paquetes que incluyen panel. Te entrego un acceso y te explico cómo usarlo."
+      "title": "Anticipo",
+      "text": "Con la cotización aprobada se paga el 50 % y empieza el desarrollo. Los tiempos corren desde que recibo el anticipo y todo tu material."
     },
     {
-      "q": "¿Usas plantillas o WordPress?",
-      "a": "No. Cada sitio se programa a la medida con Next.js. Por eso carga rápido y no depende de plugins que se descomponen."
+      "title": "Desarrollo y revisión",
+      "text": "Ves avances reales en una liga de prueba y hacemos los ajustes acordados."
     },
     {
-      "q": "¿Cómo se paga?",
-      "a": "Normalmente 50 % al empezar y 50 % al entregar. El precio se acuerda por escrito antes de iniciar."
+      "title": "Entrega",
+      "text": "Se liquida el 50 % restante y publico el sitio en tu dominio. Te enseño a editar tu contenido."
     }
-  ]
+  ],
+  "support": [
+    {
+      "title": "Garantía técnica",
+      "tag": "30 días incluidos",
+      "text": "Si algo que desarrollé falla por un error mío, lo corrijo sin costo.",
+      "items": [
+        "Botones o enlaces que dejaron de funcionar por un error de desarrollo",
+        "Formularios que no envían la información",
+        "Errores de visualización en dispositivos compatibles",
+        "Funciones entregadas que no trabajan como se acordó"
+      ]
+    },
+    {
+      "title": "Mantenimiento",
+      "tag": "Servicio opcional",
+      "text": "Para cambios, mejoras y soporte después de la garantía. No es obligatorio.",
+      "items": [
+        "Actualización de contenido",
+        "Cambios de diseño",
+        "Nuevas funciones",
+        "Actualizaciones técnicas y revisiones"
+      ]
+    },
+    {
+      "title": "Renovaciones",
+      "tag": "Costo recurrente",
+      "text": "Servicios externos que mantienen tu página en línea, con sus propios plazos y precios.",
+      "items": [
+        "Dominio",
+        "Hosting",
+        "Servicios de terceros",
+        "Herramientas de pago, cuando aplique"
+      ]
+    }
+  ],
+  "supportNote": "La garantía cubre errores del desarrollo entregado, no funciones nuevas, cambios solicitados ni fallas de servicios externos o de intervenciones de terceros. Un error de programación mío se corrige aunque ya hayan pasado los 30 días.",
+  "ownership": "El dominio y las cuentas importantes quedan a tu nombre, aunque yo los configure. Recibes los accesos acordados y conoces tus fechas de renovación: tu página no depende de mí."
 }
