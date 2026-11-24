@@ -1,0 +1,111 @@
+{
+  "whatsapp": "523112547359",
+  "whatsappMessage": "Hola RedGhost, vi tu portafolio y quiero cotizar una página web.",
+  "currency": "MXN",
+  "projects": [
+    {
+      "slug": "did-shop",
+      "name": "D.I.D Shop",
+      "kind": "Tienda en línea",
+      "summary": "Tienda de componentes electrónicos en México: catálogo con fichas técnicas, buscador, carrito y dos paneles de administración, uno para el dueño y otro para el personal de almacén.",
+      "highlights": [
+        "Catálogo de 18 productos con ficha técnica propia",
+        "Panel del dueño con GitHub y panel del personal con Google",
+        "Base de datos en Supabase con roles y permisos por usuario"
+      ],
+      "stack": ["Next.js", "TypeScript", "Supabase", "OAuth"],
+      "url": "https://redghost.shop",
+      "status": "En desarrollo",
+      "image": "/portafolio/did-shop.png"
+    },
+    {
+      "slug": "redghost-os",
+      "name": "RedGhost.OS",
+      "kind": "Sitio de marca",
+      "summary": "El sitio de la marca RedGhost, con interfaz de sistema operativo: módulos de proyectos, muro de publicaciones, tienda y un minijuego. Todo se edita desde un panel propio.",
+      "highlights": [
+        "Panel de administración con inicio de sesión",
+        "El contenido se guarda en GitHub: sin base de datos que mantener",
+        "Animaciones, sonido y un minijuego hechos a mano"
+      ],
+      "stack": ["Next.js 16", "React 19", "Auth.js", "GitHub API"],
+      "url": "/",
+      "status": "En línea",
+      "image": "/portafolio/redghost-os.png"
+    },
+    {
+      "slug": "tunel",
+      "name": "Túnel",
+      "kind": "Galería fotográfica",
+      "summary": "Archivo de fotos que se recorre como un túnel, ordenado por año y fecha. Las fotos se suben en formato RAW de cámara y se revelan dentro del navegador, sin programas externos.",
+      "highlights": [
+        "Revelado RAW en el navegador con WebAssembly",
+        "Subida de imágenes a Vercel Blob desde el panel",
+        "Orden automático por fecha de captura"
+      ],
+      "stack": ["Next.js", "WebAssembly", "Vercel Blob"],
+      "url": "/tunel",
+      "status": "En línea",
+      "image": "/portafolio/tunel.png"
+    }
+  ],
+  "packages": [
+    {
+      "name": "Landing page",
+      "price": 4500,
+      "for": "Para presentar un producto, servicio o evento en una sola página.",
+      "features": [
+        "Una página con diseño a la medida",
+        "Botón de WhatsApp y formulario de contacto",
+        "Se ve bien en celular, tablet y computadora",
+        "SEO básico para aparecer en Google"
+      ],
+      "delivery": "1 a 2 semanas",
+      "featured": false
+    },
+    {
+      "name": "Sitio para negocio",
+      "price": 9500,
+      "for": "Para negocios que necesitan varias secciones y actualizar su contenido.",
+      "features": [
+        "Hasta 5 secciones (inicio, servicios, galería, contacto…)",
+        "Panel para editar textos e imágenes tú mismo",
+        "Ubicación en Google Maps",
+        "Dominio y hosting configurados"
+      ],
+      "delivery": "2 a 4 semanas",
+      "featured": true
+    },
+    {
+      "name": "Tienda en línea",
+      "price": 18000,
+      "for": "Para vender en línea con catálogo, carrito y control de inventario.",
+      "features": [
+        "Catálogo con categorías y buscador",
+        "Carrito y pagos en línea",
+        "Panel de productos, precios e inventario",
+        "Cuentas para tu equipo con permisos"
+      ],
+      "delivery": "4 a 8 semanas",
+      "featured": false
+    }
+  ],
+  "faq": [
+    {
+      "q": "¿Necesito tener dominio y hosting?",
+      "a": "No. Te ayudo a elegir y comprar el dominio a tu nombre, y el sitio se publica en Vercel. Para la mayoría de los negocios el hosting es gratuito."
+    },
+    {
+      "q": "¿Voy a poder cambiar los textos y fotos yo mismo?",
+      "a": "Sí, en los paquetes que incluyen panel. Te entrego un acceso y te explico cómo usarlo."
+    },
+    {
+      "q": "¿Usas plantillas o WordPress?",
+      "a": "No. Cada sitio se programa a la medida con Next.js. Por eso carga rápido y no depende de plugins que se descomponen."
+    },
+    {
+      "q": "¿Cómo se paga?",
+      "a": "Normalmente 50 % al empezar y 50 % al entregar. El precio se acuerda por escrito antes de iniciar."
+    }
+  ]
+}

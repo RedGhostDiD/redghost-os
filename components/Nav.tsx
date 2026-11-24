@@ -22,6 +22,7 @@ const UTILITY = [
   { label: "IDENTITY", href: "/sobre-mi" },
   { label: "NETWORK", href: "/redes" },
   { label: "CONTACT", href: "/contacto" },
+  { label: "HIRE ME", href: "/portafolio" },
 ];
 
 export default function Nav() {
