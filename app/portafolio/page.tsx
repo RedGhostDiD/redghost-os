@@ -405,6 +405,7 @@ export default function PortafolioPage() {
           <div className="pf-contact-main">
             <h2 className="pf-contact-title"><T es="contacto;" en="contact;" /></h2>
             <a href={`mailto:${SITE_CONFIG.email}`} className="pf-email">{SITE_CONFIG.email}</a>
+            <WaLink className="pf-email" es={displayPhone(whatsapp)} en={displayPhone(whatsapp)} />
             <p className="pf-contact-icons">
               <StackIcon /> <BaselineIcon /> <ArrowUpRight />
             </p>
