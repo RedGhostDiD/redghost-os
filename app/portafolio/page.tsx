@@ -26,7 +26,7 @@ import {
 } from "@/components/portafolio/Marks";
 
 function displayPhone(n: string) {
-  // 523112547359 → +52 311 254 7359
+  // 523111076339 → +52 311 107 6339
   return n.length === 12 ? `+${n.slice(0, 2)} ${n.slice(2, 5)} ${n.slice(5, 8)} ${n.slice(8)}` : `+${n}`;
 }
 
