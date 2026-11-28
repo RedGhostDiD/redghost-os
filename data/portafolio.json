@@ -25,6 +25,27 @@
       "image": "/portafolio/did-shop.png"
     },
     {
+      "slug": "black-crown",
+      "name": "Black Crown Barber Club",
+      "kind": "Branding + sitio para negocio",
+      "summary": "Caso de estudio de una barbería ficticia en Tepic: tres propuestas de logo, manual de marca, wireframes y un sitio de 5 secciones con reservaciones que no permiten horarios duplicados y un panel de agenda.",
+      "highlights": [
+        "Reserva por servicio, barbero, fecha y hora, solo con horarios libres",
+        "Panel con la agenda del día por barbero",
+        "Logo, manual de identidad y SEO local"
+      ],
+      "stack": [
+        "Next.js",
+        "React 19",
+        "Branding",
+        "SEO local"
+      ],
+      "url": "/portafolio/black-crown/caso",
+      "status": "En línea",
+      "demo": true,
+      "image": "/portafolio/black-crown.png"
+    },
+    {
       "slug": "redghost-os",
       "name": "RedGhost.OS",
       "kind": "Sitio de marca",

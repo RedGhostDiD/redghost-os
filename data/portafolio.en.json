@@ -21,6 +21,11 @@
       "kind": "Landing page",
       "summary": "Demo page for a burger joint: a loading screen where the monster eats the bar, scroll animations, a menu with combos and WhatsApp orders with the message already written.",
       "status": "Live"
+    },
+    "black-crown": {
+      "kind": "Branding + business website",
+      "summary": "Case study for a fictional barbershop in Tepic: three logo proposals, a brand manual, wireframes and a 5-section site with bookings that never double-book plus a schedule panel.",
+      "status": "Live"
     }
   },
   "packages": [
